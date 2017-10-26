@@ -2,42 +2,31 @@ package fr.upmc.boteam.obo_app;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-
-import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
-    Client socket = new Client("192.168.42.91", 3000);
+    final String LOGIN = "user1";
+    final String PASSWORD = "pass1";
+    final String ROBOT_ID = "robot1";
+
+    ClientCallback client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        socket.setClientCallback(new Client.ClientCallback () {
-            @Override
-            public void onMessage(String message) {
-                Log.i("MainActivity", message);
-                socket.disconnect();
-            }
+        client = new ClientCallback();
+        client.setUser(LOGIN, PASSWORD);
+        client.setRobotId(ROBOT_ID);
 
-            @Override
-            public void onConnect(Socket s) {
-                socket.send("ggg");
-            }
+        client.connect();
+        client.callback();
+    }
 
-            @Override
-            public void onDisconnect(Socket socket, String message) {
-
-            }
-
-            @Override
-            public void onConnectError(Socket socket, String message) {
-
-            }
-        });
-
-        socket.connect();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        client.disconnect();
     }
 }

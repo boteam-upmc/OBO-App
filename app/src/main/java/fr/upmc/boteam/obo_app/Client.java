@@ -7,24 +7,21 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-/**
- * Created by adel on 20/10/17.
- */
-public class Client {
+class Client {
     private Socket socket;
     private OutputStream socketOutput;
     private BufferedReader socketInput;
 
     private String ip;
     private int port;
-    private ClientCallback listener=null;
+    private ClientCallback listener;
 
-    public Client(String ip, int port){
-        this.ip=ip;
-        this.port=port;
+    Client(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
     }
 
-    public void connect(){
+    void connect() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -37,58 +34,66 @@ public class Client {
 
                     new ReceiveThread().start();
 
-                    if(listener!=null)
+                    if (listener != null) {
                         listener.onConnect(socket);
+                    }
                 } catch (IOException e) {
-                    if(listener!=null)
+                    if (listener != null) {
                         listener.onConnectError(socket, e.getMessage());
+                    }
                 }
             }
         }).start();
     }
 
-    public void disconnect(){
+    void disconnect() {
         try {
             socket.close();
-        } catch (IOException e) {
-            if(listener!=null)
-                listener.onDisconnect(socket, e.getMessage());
-        }
-    }
 
-    public void send(String message){
-        try {
-            socketOutput.write(message.getBytes());
         } catch (IOException e) {
-            if(listener!=null)
+            if (listener != null) {
                 listener.onDisconnect(socket, e.getMessage());
-        }
-    }
-
-    private class ReceiveThread extends Thread implements Runnable{
-        public void run(){
-            String message;
-            try {
-                while((message = socketInput.readLine()) != null) {   // each line must end with a \n to be received
-                    if(listener!=null)
-                        listener.onMessage(message);
-                }
-            } catch (IOException e) {
-                if(listener!=null)
-                    listener.onDisconnect(socket, e.getMessage());
             }
         }
     }
 
-    public void setClientCallback(ClientCallback listener){
-        this.listener=listener;
+    void emit(String tag, String message) {
+        try {
+            String localMessage = tag + "_" + message;
+            socketOutput.write(localMessage.getBytes());
+
+        } catch (IOException e) {
+            if (listener != null) {
+                listener.onDisconnect(socket, e.getMessage());
+            }
+        }
     }
 
-    public void removeClientCallback(){
-        this.listener=null;
+    private class ReceiveThread extends Thread implements Runnable {
+
+        public void run() {
+            String message;
+
+            try {
+                // !!! each line must end with a \n to be received !!!
+                while ((message = socketInput.readLine()) != null) {
+                    if (listener != null) {
+                        listener.onMessage(message);
+                    }
+                }
+            } catch (IOException e) {
+                if (listener != null) {
+                    listener.onDisconnect(socket, e.getMessage());
+                }
+            }
+        }
     }
 
-    public interface ClientCallback {
+    void setClientCallback(ClientCallback listener) {
+        this.listener = listener;
+    }
+
+    interface ClientCallback {
         void onMessage(String message);
         void onConnect(Socket socket);
         void onDisconnect(Socket socket, String message);
