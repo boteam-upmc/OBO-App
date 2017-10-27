@@ -1,6 +1,7 @@
 package fr.upmc.boteam.obo_app;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import java.net.Socket;
 import java.util.HashMap;
@@ -10,15 +11,12 @@ class ClientCallback {
     private final String LOG_TAG = "ClientCallback";
 
     private static class Event {
-        //static final String LOGIN = "onLogin";
-        static final String ASSOCIATION_REQUEST = "onAssociationRequest";
+        static final String LOGIN = "onLogin";
     }
 
     private static class Key {
-        /*static final String FIRST_NAME = "FIRST_NAME";
-        static final String SECOND_NAME = "SECOND_NAME";
-        static final String EMAIL = "EMAIL";
-        static final String ALPHA = "ALPHA";*/
+        static final String PASS = "PASS";
+        static final String LOGIN = "LOGIN";
         static final String SERIAL_NUMBER = "SERIAL_NUMBER";
     }
 
@@ -30,7 +28,7 @@ class ClientCallback {
     {
         //final String SERVER_ADDRESS = "xxx.xxx.xx.xx";
         final String LOCAL_ADDRESS = "192.168.42.91";
-        final int PORT = 1337;
+        final int PORT = 3000;
 
         this.socket = new Client(LOCAL_ADDRESS, PORT);
     }
@@ -40,12 +38,10 @@ class ClientCallback {
         this.isRobotAccepted = false;
     }
 
-    /*void setUser(String firstName, String secondName, String email, int alpha) {
-        messages.put(Key.FIRST_NAME, firstName);
-        messages.put(Key.SECOND_NAME, secondName);
-        messages.put(Key.EMAIL, email);
-        messages.put(Key.ALPHA, alpha);
-    }*/
+    void setUser(String login, String pass) {
+        messages.put(Key.LOGIN, login);
+        messages.put(Key.PASS, pass);
+    }
 
     void setRobot(String serialNumber) {
         messages.put(Key.SERIAL_NUMBER, serialNumber);
@@ -64,7 +60,7 @@ class ClientCallback {
     }
 
     void sendAssociationRequest() {
-        socket.emit(Event.ASSOCIATION_REQUEST, toJsonFormat(messages));
+        socket.emit(Event.LOGIN, toJsonFormat(messages));
     }
 
     void callback() {
@@ -79,9 +75,11 @@ class ClientCallback {
 
                     if (message.contains("T")) {
                         isRobotAccepted = true;
+                        Log.i(LOG_TAG, "isRobotAccepted=" + true);
 
                     } else if (message.contains("F")) {
                         isRobotAccepted = false;
+                        Log.i(LOG_TAG, "isRobotAccepted=" + false);
 
                     } else {
                         isRobotAccepted = false;
