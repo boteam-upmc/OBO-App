@@ -59,7 +59,7 @@ class Client {
 
     void emit(String tag, String message) {
         try {
-            String localMessage = tag + "_" + message;
+            String localMessage = tag + "/" + message;
             socketOutput.write(localMessage.getBytes());
 
         } catch (IOException e) {
