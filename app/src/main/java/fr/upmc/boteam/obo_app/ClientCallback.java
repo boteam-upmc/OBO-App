@@ -1,11 +1,20 @@
 package fr.upmc.boteam.obo_app;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import java.net.Socket;
 import java.util.HashMap;
 
-class ClientCallback {
+import fr.upmc.boteam.obo_app.services.ServerService;
+
+import static fr.upmc.boteam.obo_app.services.ServerService.ACTION_SEND_VIDEO;
+import static fr.upmc.boteam.obo_app.services.ServerService.ACTION_SHOW_HELLO_WORLD;
+import static fr.upmc.boteam.obo_app.services.ServerService.EXTRA_HELLO;
+import static fr.upmc.boteam.obo_app.services.ServerService.EXTRA_VIDEO;
+
+public class ClientCallback {
 
     private final String LOG_TAG = "ClientCallback";
 
@@ -23,11 +32,11 @@ class ClientCallback {
     private boolean isRobotAccepted;
 
     /* singleton socket */
-    private Client socket;
+    public static Client socket;
     {
         //final String SERVER_ADDRESS = "xxx.xxx.xx.xx";
-        final String LOCAL_ADDRESS = "192.168.42.187";
-        final int PORT = 1337;
+        final String LOCAL_ADDRESS = "192.168.43.250";
+        final int PORT = 3000;
 
         this.socket = new Client(LOCAL_ADDRESS, PORT);
     }
@@ -62,6 +71,14 @@ class ClientCallback {
         socket.emit(Event.LOGIN, toJsonFormat(messages));
     }
 
+    void testVideo(Context c) {
+        Context appContext = c;
+        Intent intent = new Intent(appContext, ServerService.class);
+        intent.setAction(ACTION_SEND_VIDEO);
+        intent.putExtra(EXTRA_VIDEO, "VIDEO");
+        appContext.startService(intent);
+    }
+
     void callback() {
         socket.setClientCallback(new Client.ClientCallback () {
             @Override
@@ -84,6 +101,8 @@ class ClientCallback {
                         isRobotAccepted = false;
                         Log.i(LOG_TAG, "Unknown : " + message);
                     }
+                } else {
+                    Log.i(LOG_TAG, "NOT HANDLED MESSAGE : " + message);
                 }
             }
 

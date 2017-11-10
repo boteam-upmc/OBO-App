@@ -7,7 +7,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-class Client {
+public class Client {
+
     private Socket socket;
     private OutputStream socketOutput;
     private BufferedReader socketInput;
@@ -16,7 +17,7 @@ class Client {
     private int port;
     private ClientCallback listener;
 
-    Client(String ip, int port) {
+    public Client(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
@@ -67,6 +68,39 @@ class Client {
                 listener.onDisconnect(socket, e.getMessage());
             }
         }
+    }
+
+    void emitBytes(String tag, byte[] message) {
+        try {
+            String result = tag + "/" + message.toString();
+            byte[] localMessage = result.getBytes();
+            socketOutput.write(localMessage);
+
+        } catch (IOException e) {
+            if (listener != null) {
+                listener.onDisconnect(socket, e.getMessage());
+            }
+        }
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public OutputStream getSocketOutput() {
+        return socketOutput;
+    }
+
+    public BufferedReader getSocketInput() {
+        return socketInput;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     private class ReceiveThread extends Thread implements Runnable {

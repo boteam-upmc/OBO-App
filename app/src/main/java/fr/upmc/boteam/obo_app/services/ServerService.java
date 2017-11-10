@@ -2,7 +2,22 @@ package fr.upmc.boteam.obo_app.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.graphics.Path;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
+import fr.upmc.boteam.obo_app.ClientCallback;
 
 
 /**
@@ -16,10 +31,21 @@ public class ServerService extends IntentService {
 
     public static final String ACTION_SHOW_HELLO_WORLD = "fr.upmc.boteam.obo_app.services.action.HELLO_WORLD";
     public static final String ACTION_SHOW_YOLO = "fr.upmc.boteam.obo_app.services.action.YOLO";
+    public static final String ACTION_SEND_VIDEO = "fr.upmc.boteam.obo_app.services.action.SEND_VIDEO";
 
     public static final String EXTRA_HELLO = "fr.upmc.boteam.obo_app.services.extra.HELLO";
     public static final String EXTRA_WORLD = "fr.upmc.boteam.obo_app.services.extra.WORLD";
     public static final String EXTRA_YOLO = "fr.upmc.boteam.obo_app.services.extra.YOLO";
+    public static final String EXTRA_VIDEO = "fr.upmc.boteam.obo_app.services.extra.VIDEO";
+
+
+
+    public static final String path = "/storage/emulated/0/OBOApp/";
+
+    private Socket socket;
+    private OutputStream socketOutput;
+    private BufferedReader socketInput;
+
 
     public ServerService() {
         super("ServerService");
@@ -38,6 +64,41 @@ public class ServerService extends IntentService {
             } else if (ACTION_SHOW_YOLO.equals(action)) {
                 final String param = intent.getStringExtra(EXTRA_YOLO);
                 handleActionYolo(param);
+
+            } else if (ACTION_SEND_VIDEO.equals(action)) {
+                final String param = intent.getStringExtra(EXTRA_VIDEO);
+                Log.i(LOG_TAG, "SUCCESS");
+                handleActionSendVideo(param);
+                Log.i(LOG_TAG, "SUCCESS-2");
+            }
+        }
+    }
+
+    /**
+     * Handle action Send Video in the provided background thread with the provided
+     * parameter.
+     */
+    private void handleActionSendVideo(String param) {
+        if(param != null) {
+            String videoPath = path + param + ".mp4";
+            File file = new File(videoPath);
+            socket = ClientCallback.socket.getSocket();
+
+            try {
+                socketOutput = ClientCallback.socket.getSocketOutput();
+                InputStream is = new FileInputStream(file);
+                socketInput = ClientCallback.socket.getSocketInput();
+
+                RandomAccessFile f = new RandomAccessFile(file, "r");
+                byte[] bytes = new byte[(int)f.length()];
+                f.readFully(bytes);
+                String sending = "onVideo/" + bytes.toString();
+                socketOutput.write(sending.getBytes());
+                //Listening to the server response
+                String reponse = socketInput.readLine();
+                System.out.println("RECEIVED");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
