@@ -15,15 +15,21 @@ import android.view.WindowManager;
 import java.io.File;
 import java.io.IOException;
 
+import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
+import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED;
+import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_UNKNOWN;
+
 public class VideoCapture extends AppCompatActivity implements View.OnClickListener,
-        SurfaceHolder.Callback {
+        SurfaceHolder.Callback , MediaRecorder.OnInfoListener {
 
     private static final String LOG_TAG = "VideoCapture";
 
+    int recordsCounter;
     MediaRecorder recorder;
     SurfaceHolder holder;
     boolean recording;
     {
+        recordsCounter = 0;
         recording = false;
     }
 
@@ -35,7 +41,8 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         recorder = new MediaRecorder();
-        initRecorder("rec1");
+        recorder.setOnInfoListener(this);
+        initRecorder("rec" + recordsCounter);
         setContentView(R.layout.activity_video_capture);
 
         SurfaceView cameraView = (SurfaceView) findViewById(R.id.sv_camera);
@@ -50,7 +57,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         final String EXTENSION = ".mp4";
         final String SEPARATOR = File.separator;
         final int QUALITY = CamcorderProfile.QUALITY_HIGH;
-        final int MAX_DURATION = 50000; // 50 seconds
+        final int MAX_DURATION = 3000; // 50000 = 50 seconds
         //final int MAX_FILE_SIZE = 5000000; // Approximately 5 megabytes
 
         recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
@@ -112,12 +119,49 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if (recording) {
+        /*if (recording) {
             recorder.stop();
             recording = false;
-        }
+        }*/
 
-        recorder.release();
-        finish();
+        //recorder.release();
+        //finish();
+    }
+
+    @Override
+    public void onInfo(MediaRecorder mr, int what, int extra) {
+
+        switch(what) {
+            case MEDIA_RECORDER_INFO_UNKNOWN :
+                Log.i(LOG_TAG, "INFO_UNKNOWN");
+                break;
+
+            //case MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING :
+            case MEDIA_RECORDER_INFO_MAX_DURATION_REACHED :
+                Log.i(LOG_TAG, "MAX_DURATION_REACHED");
+                recordsCounter++;
+
+                if (recordsCounter % 2 == 0) {
+
+                    Log.i(LOG_TAG, "cpt=" + recordsCounter);
+                    //recorder.stop();
+                    recorder.release();
+
+                    initRecorder("rec" + recordsCounter);
+                    prepareRecorder();
+
+                    recorder.start();
+                    //finish();
+                }
+
+                /*initRecorder("rec" + recordsCounter);
+                prepareRecorder();
+                recorder.reset();*/
+                break;
+
+            case MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED :
+                Log.i(LOG_TAG, "MAX_FILESIZE_REACHED");
+                break;
+        }
     }
 }
