@@ -1,7 +1,6 @@
 package fr.upmc.boteam.obo_app;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import java.net.Socket;
 import java.util.HashMap;
@@ -27,8 +26,8 @@ class ClientCallback {
     private Client socket;
     {
         //final String SERVER_ADDRESS = "xxx.xxx.xx.xx";
-        final String LOCAL_ADDRESS = "192.168.42.91";
-        final int PORT = 3000;
+        final String LOCAL_ADDRESS = "192.168.42.187";
+        final int PORT = 1337;
 
         this.socket = new Client(LOCAL_ADDRESS, PORT);
     }
@@ -101,7 +100,7 @@ class ClientCallback {
 
             @Override
             public void onConnectError(Socket socket, String message) {
-                Log.i(LOG_TAG, "Connection error.");
+                Log.i(LOG_TAG, "Connection error." + message);
                 disconnect();
             }
         });
