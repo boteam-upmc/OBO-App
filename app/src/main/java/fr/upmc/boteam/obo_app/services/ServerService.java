@@ -109,6 +109,7 @@ public class ServerService extends IntentService {
 
         } else {
             Log.i(LOG_TAG, "handleActionShowHelloWorld : params are null");
+            //
         }
     }
 
