@@ -1,5 +1,7 @@
 package fr.upmc.boteam.obo_app;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -58,7 +60,7 @@ public class Client {
         }
     }
 
-    void emit(String tag, String message) {
+    public void emit(String tag, String message) {
         try {
             String localMessage = tag + "/" + message;
             socketOutput.write(localMessage.getBytes());
@@ -70,7 +72,7 @@ public class Client {
         }
     }
 
-    void emitBytes(String tag, byte[] message) {
+    public void emitBytes(String tag, byte[] message) {
         try {
             String result = tag + "/" + message.toString();
             byte[] localMessage = result.getBytes();
@@ -108,22 +110,24 @@ public class Client {
         public void run() {
             String message;
 
-            try {
-                // !!! each line must end with a \n to be received !!!
-                while ((message = socketInput.readLine()) != null) {
-                    if (listener != null) {
-                        listener.onMessage(message);
+            while (true) {
+                try {
+                    // !!! each line must end with a \n to be received !!!
+                    while ((message = socketInput.readLine()) != null) {
+                        if (listener != null) {
+                            listener.onMessage(message);
+                        }
                     }
-                }
-            } catch (IOException e) {
-                if (listener != null) {
-                    listener.onDisconnect(socket, e.getMessage());
+                } catch (IOException e) {
+                    if (listener != null) {
+                        listener.onDisconnect(socket, e.getMessage());
+                    }
                 }
             }
         }
     }
 
-    void setClientCallback(ClientCallback listener) {
+    public void setClientCallback(ClientCallback listener) {
         this.listener = listener;
     }
 

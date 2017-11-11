@@ -79,7 +79,7 @@ public class ClientCallback {
         appContext.startService(intent);
     }
 
-    void callback() {
+    public void callback() {
         socket.setClientCallback(new Client.ClientCallback () {
             @Override
             public void onMessage(String message) {
