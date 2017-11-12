@@ -79,6 +79,10 @@ public class ClientCallback {
         appContext.startService(intent);
     }
 
+    void testEmit() {
+        socket.emit("onVideo", "EOF");
+    }
+
     public void callback() {
         socket.setClientCallback(new Client.ClientCallback () {
             @Override

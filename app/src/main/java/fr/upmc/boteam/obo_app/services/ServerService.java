@@ -75,16 +75,16 @@ public class ServerService extends IntentService {
     private void handleActionSendVideo(String param) {
         if(param != null) {
             String videoPath = path + param + ".mp4";
-
+            int n;
             try {
                 File file = new File(videoPath);
                 byte[] buffer = new byte[(int)file.length()];
                 fis = new FileInputStream(file);
                 bis = new BufferedInputStream(fis);
-                bis.read(buffer,0,buffer.length);
                 System.out.println("Sending " + videoPath + "(" + buffer.length + " bytes)");
-                client.emitVideo(buffer);
-                //client.emit("onVideo", "EOF");
+                while((n = bis.read(buffer,0,buffer.length)) != -1){
+                    client.emitVideo(buffer, n);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

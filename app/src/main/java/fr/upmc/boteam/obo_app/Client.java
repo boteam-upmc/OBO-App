@@ -62,8 +62,8 @@ public class Client {
 
     public void emit(String tag, String message) {
         try {
-            String localMessage = tag + "/" + message;
-            socketOutput.write(localMessage.getBytes());
+            socketOutput.write((tag + "/" + message).getBytes());
+            socketOutput.flush();
 
         } catch (IOException e) {
             if (listener != null) {
@@ -85,11 +85,10 @@ public class Client {
         }
     }
 
-    public void emitVideo(byte[] buffer) {
+    public void emitVideo(byte[] buffer, int n) {
         try {
-            socketOutput.write(buffer, 0, buffer.length);
-            //socketOutput.flush();
-            //emit("onVideo", "EOF");
+            socketOutput.write(buffer, 0, n);
+            socketOutput.flush();
         } catch (IOException e) {
             if (listener != null) {
                 listener.onDisconnect(socket, e.getMessage());
