@@ -4,13 +4,12 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.net.Socket;
 
 import fr.upmc.boteam.obo_app.Client;
@@ -40,10 +39,8 @@ public class ServerService extends IntentService {
     public static final String path = "/storage/emulated/0/OBOApp/";
 
     private Client client = ClientCallback.socket;
-    private Socket socket;
-    private OutputStream socketOutput;
-    private InputStream socketInput;
-
+    FileInputStream fis = null;
+    BufferedInputStream bis = null;
 
     public ServerService() {
         super("ServerService");
@@ -78,19 +75,15 @@ public class ServerService extends IntentService {
     private void handleActionSendVideo(String param) {
         if(param != null) {
             String videoPath = path + param + ".mp4";
-            FileInputStream file = null;
-            socket = client.getSocket();
 
             try {
-                file = new FileInputStream(videoPath);
-                socketOutput = socket.getOutputStream();
-                socketInput = socket.getInputStream();
-                byte[] buffer = new byte[(int)(1.3 * Math.pow(10,7))];
-                int length = 0;
-                while ( (length = file.read(buffer, 0, buffer.length)) != -1 ){
-                    socketOutput.write(buffer, 0, length);
-                }
-                socketOutput.flush();
+                File file = new File(videoPath);
+                byte[] buffer = new byte[(int)file.length()];
+                fis = new FileInputStream(file);
+                bis = new BufferedInputStream(fis);
+                bis.read(buffer,0,buffer.length);
+                System.out.println("Sending " + videoPath + "(" + buffer.length + " bytes)");
+                client.emitVideo(buffer);
                 //client.emit("onVideo", "EOF");
             } catch (IOException e) {
                 e.printStackTrace();

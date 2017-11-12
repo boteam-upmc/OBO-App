@@ -85,6 +85,18 @@ public class Client {
         }
     }
 
+    public void emitVideo(byte[] buffer) {
+        try {
+            socketOutput.write(buffer, 0, buffer.length);
+            //socketOutput.flush();
+            //emit("onVideo", "EOF");
+        } catch (IOException e) {
+            if (listener != null) {
+                listener.onDisconnect(socket, e.getMessage());
+            }
+        }
+    }
+
     public Socket getSocket() {
         return socket;
     }
