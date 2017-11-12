@@ -65,9 +65,8 @@ public class ServerService extends IntentService {
 
             } else if (ACTION_SEND_VIDEO.equals(action)) {
                 final String param = intent.getStringExtra(EXTRA_VIDEO);
-                Log.i(LOG_TAG, "SUCCESS");
                 handleActionSendVideo(param);
-                Log.i(LOG_TAG, "SUCCESS-2");
+                Log.i(LOG_TAG, "SUCCESS");
             }
         }
     }
@@ -86,13 +85,13 @@ public class ServerService extends IntentService {
                 file = new FileInputStream(videoPath);
                 socketOutput = socket.getOutputStream();
                 socketInput = socket.getInputStream();
-                byte[] buffer = new byte[(int)(1.29 * Math.pow(10,7))];
+                byte[] buffer = new byte[(int)(1.3 * Math.pow(10,7))];
                 int length = 0;
                 while ( (length = file.read(buffer, 0, buffer.length)) != -1 ){
                     socketOutput.write(buffer, 0, length);
-                    //client.emitBytes("onVideo", buffer);
                 }
-                client.emit("onVideo", "FIN");
+                socketOutput.flush();
+                //client.emit("onVideo", "EOF");
             } catch (IOException e) {
                 e.printStackTrace();
             }
