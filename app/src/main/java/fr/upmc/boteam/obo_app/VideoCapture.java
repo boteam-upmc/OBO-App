@@ -1,8 +1,14 @@
 package fr.upmc.boteam.obo_app;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.CamcorderProfile;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +17,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,11 +30,19 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         SurfaceHolder.Callback , MediaRecorder.OnInfoListener {
 
     private static final String LOG_TAG = "VideoCapture";
+    public static final String MY_PREFERENCES = "fr.upmc.boteam.obo_app.services.extra.MY_PREFERENCES";
 
-    int recordsCounter;
-    MediaRecorder recorder;
-    SurfaceHolder holder;
-    boolean recording;
+    public static final String KEY_RECORDS_COUNTER = "fr.upmc.boteam.obo_app.services.extra.KEY_RECORDS_COUNTER";
+
+    private SharedPreferences sharedPref;
+
+    private Context mContext;
+
+    private int recordsCounter;
+    private SurfaceView cameraView;
+    private MediaRecorder recorder;
+    private SurfaceHolder holder;
+    private boolean recording;
     {
         recordsCounter = 0;
         recording = false;
@@ -45,19 +60,23 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         initRecorder("rec" + recordsCounter);
         setContentView(R.layout.activity_video_capture);
 
-        SurfaceView cameraView = (SurfaceView) findViewById(R.id.sv_camera);
+        cameraView = findViewById(R.id.sv_camera);
         holder = cameraView.getHolder();
         holder.addCallback(this);
 
         cameraView.setClickable(true);
         cameraView.setOnClickListener(this);
+
+        sharedPref = getSharedPreferences(MY_PREFERENCES, Context.MODE_PRIVATE);
+
+        mContext = getApplicationContext();
     }
 
     private void initRecorder(String recordName) {
         final String EXTENSION = ".mp4";
         final String SEPARATOR = File.separator;
         final int QUALITY = CamcorderProfile.QUALITY_HIGH;
-        final int MAX_DURATION = 3000; // 50000 = 50 seconds
+        final int MAX_DURATION = 5000; // 50000 = 50 seconds
         //final int MAX_FILE_SIZE = 5000000; // Approximately 5 megabytes
 
         recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
@@ -70,6 +89,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         //recorder.setMaxFileSize(MAX_FILE_SIZE);
     }
 
+    @NonNull
     private String getDirectory() {
         File folder = new File(Environment.getExternalStorageDirectory() + "/OBOApp");
 
@@ -96,14 +116,16 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (recording) {
+            Log.i(LOG_TAG, "STOP");
             recorder.stop();
             recording = false;
 
             // Let's initRecorder so we can record again
-            initRecorder("rec1");
+            initRecorder("rec" + recordsCounter / 2);
             prepareRecorder();
 
         } else {
+            Log.i(LOG_TAG, "START");
             recording = true;
             recorder.start();
         }
@@ -118,15 +140,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        /*if (recording) {
-            recorder.stop();
-            recording = false;
-        }*/
-
-        //recorder.release();
-        //finish();
-    }
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
@@ -136,32 +150,79 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
                 Log.i(LOG_TAG, "INFO_UNKNOWN");
                 break;
 
-            //case MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING :
             case MEDIA_RECORDER_INFO_MAX_DURATION_REACHED :
-                Log.i(LOG_TAG, "MAX_DURATION_REACHED");
                 recordsCounter++;
 
                 if (recordsCounter % 2 == 0) {
+                    Log.i(LOG_TAG, "Record n°" + ((recordsCounter / 2) - 1) + " saved.");
+                    cameraView.performClick();
+                    cameraView.performClick();
 
-                    Log.i(LOG_TAG, "cpt=" + recordsCounter);
-                    //recorder.stop();
-                    recorder.release();
+                    String path = Environment.getExternalStorageDirectory() + "/OBOApp/rec" + ((recordsCounter / 2) - 1) + ".mp4";
+                    Log.i(LOG_TAG, path);
 
-                    initRecorder("rec" + recordsCounter);
-                    prepareRecorder();
-
-                    recorder.start();
-                    //finish();
+                    //createVideoThumbnail(mContext, Uri.fromFile(new File(path)));
                 }
-
-                /*initRecorder("rec" + recordsCounter);
-                prepareRecorder();
-                recorder.reset();*/
                 break;
 
             case MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED :
                 Log.i(LOG_TAG, "MAX_FILESIZE_REACHED");
                 break;
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        storeInSharedPreferences(KEY_RECORDS_COUNTER, (recordsCounter / 2) - 1);
+
+        /*if (recording) {
+            recorder.stop();
+            recording = false;
+        }
+
+        recorder.release();
+        finish();*/
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        restoreFromSharedPreferences();
+    }
+
+    private void storeInSharedPreferences(String key, int intValue) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(key, intValue);
+        editor.apply();
+
+        Log.i(LOG_TAG, "intValue=" + intValue);
+    }
+
+    private void restoreFromSharedPreferences() {
+        recordsCounter = sharedPref.getInt(KEY_RECORDS_COUNTER, 0);
+
+        Log.i(LOG_TAG, "recordsCounter=" + recordsCounter);
+    }
+
+    public Bitmap createVideoThumbnail(Context context, Uri uri) {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
+        try {
+            retriever.setDataSource(context, uri);
+            bitmap = retriever.getFrameAtTime(-1);
+
+        } catch (RuntimeException ex) {
+            // Assume this is a corrupt video file.
+        } finally {
+            try {
+                retriever.release();
+            } catch (RuntimeException ex) {
+                // Ignore failures while cleaning up.
+            }
+        }
+        return bitmap;
     }
 }
