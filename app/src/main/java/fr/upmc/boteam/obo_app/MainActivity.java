@@ -51,6 +51,15 @@ public class MainActivity extends AppCompatActivity {
                 checkPermission();
 
                 client.testVideo(getApplicationContext());
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                client.testEmit();
+
             }
         });
     }

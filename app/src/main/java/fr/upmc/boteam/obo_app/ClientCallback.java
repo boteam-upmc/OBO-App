@@ -31,6 +31,8 @@ public class ClientCallback {
     private HashMap<String, Object> messages;
     private boolean isRobotAccepted;
 
+    private int counter = 0;
+
     /* singleton socket */
     public static Client socket;
     {
@@ -75,7 +77,8 @@ public class ClientCallback {
         Context appContext = c;
         Intent intent = new Intent(appContext, ServerService.class);
         intent.setAction(ACTION_SEND_VIDEO);
-        intent.putExtra(EXTRA_VIDEO, "VIDEO");
+        intent.putExtra(EXTRA_VIDEO, "VIDEO_" + counter);
+        counter++;
         appContext.startService(intent);
     }
 
