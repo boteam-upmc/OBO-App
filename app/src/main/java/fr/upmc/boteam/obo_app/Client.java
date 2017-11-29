@@ -1,6 +1,6 @@
 package fr.upmc.boteam.obo_app;
 
-import android.util.Log;
+import android.os.AsyncTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,8 +24,33 @@ public class Client {
         this.port = port;
     }
 
+    private class ConnectTask extends AsyncTask<String, Void, Void> {
+
+        protected Void doInBackground(String... ip) {
+            socket = new Socket();
+            InetSocketAddress socketAddress = new InetSocketAddress(ip[0], port);
+            try {
+                socket.connect(socketAddress);
+                socketOutput = socket.getOutputStream();
+                socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                new ReceiveThread().start();
+
+                if (listener != null) {
+                    listener.onConnect(socket);
+                }
+            } catch (IOException e) {
+                if (listener != null) {
+                    listener.onConnectError(socket, e.getMessage());
+                }
+            }
+            return null;
+        }
+    }
+
     void connect() {
-        new Thread(new Runnable() {
+        new ConnectTask().execute(ip);
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 socket = new Socket();
@@ -46,7 +71,7 @@ public class Client {
                     }
                 }
             }
-        }).start();
+        }).start();*/
     }
 
     void disconnect() {
@@ -61,13 +86,25 @@ public class Client {
     }
 
     public void emit(String tag, String message) {
-        try {
-            socketOutput.write((tag + "/" + message).getBytes());
-            socketOutput.flush();
+        if(socketOutput == null) {
+            try {
+                socketOutput = socket.getOutputStream();
+                socketOutput.write((tag + "/" + message).getBytes());
+                socketOutput.flush();
+            } catch (IOException e) {
+                if (listener != null) {
+                    listener.onDisconnect(socket, e.getMessage());
+                }
+            }
+        } else {
+            try {
+                socketOutput.write((tag + "/" + message).getBytes());
+                socketOutput.flush();
 
-        } catch (IOException e) {
-            if (listener != null) {
-                listener.onDisconnect(socket, e.getMessage());
+            } catch (IOException e) {
+                if (listener != null) {
+                    listener.onDisconnect(socket, e.getMessage());
+                }
             }
         }
     }

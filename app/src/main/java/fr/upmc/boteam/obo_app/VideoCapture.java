@@ -1,7 +1,9 @@
 package fr.upmc.boteam.obo_app;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.CamcorderProfile;
 import android.media.MediaMetadataRetriever;
@@ -9,6 +11,8 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +38,9 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
 
     public static final String KEY_RECORDS_COUNTER = "fr.upmc.boteam.obo_app.services.extra.KEY_RECORDS_COUNTER";
 
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 112;
+    private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 113;
+
     private SharedPreferences sharedPref;
 
     private Context mContext;
@@ -55,9 +62,11 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        checkPermission();
+
         recorder = new MediaRecorder();
         recorder.setOnInfoListener(this);
-        initRecorder("rec" + recordsCounter);
+        initRecorder("VIDEO_" + recordsCounter);
         setContentView(R.layout.activity_video_capture);
 
         cameraView = findViewById(R.id.sv_camera);
@@ -79,6 +88,12 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         final int MAX_DURATION = 5000; // 50000 = 50 seconds
         //final int MAX_FILE_SIZE = 5000000; // Approximately 5 megabytes
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
+                    MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+
+        }
         recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
         recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
@@ -121,7 +136,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
             recording = false;
 
             // Let's initRecorder so we can record again
-            initRecorder("rec" + recordsCounter / 2);
+            initRecorder("VIDEO_" + recordsCounter / 2);
             prepareRecorder();
 
         } else {
@@ -158,7 +173,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
                     cameraView.performClick();
                     cameraView.performClick();
 
-                    String path = Environment.getExternalStorageDirectory() + "/OBOApp/rec" + ((recordsCounter / 2) - 1) + ".mp4";
+                    String path = Environment.getExternalStorageDirectory() + "/OBOApp/VIDEO_" + ((recordsCounter / 2) - 1) + ".mp4";
                     Log.i(LOG_TAG, path);
 
                     //createVideoThumbnail(mContext, Uri.fromFile(new File(path)));
@@ -224,5 +239,47 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
             }
         }
         return bitmap;
+    }
+
+    public void checkPermission() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }
