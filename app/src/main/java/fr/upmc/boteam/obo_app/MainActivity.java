@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
                 client.testEmit();
 
+                recordVideo(v);
+
 
 
             }
