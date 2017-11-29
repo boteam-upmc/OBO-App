@@ -1,6 +1,7 @@
 package fr.upmc.boteam.obo_app;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -60,11 +61,18 @@ public class MainActivity extends AppCompatActivity {
 
                 client.testEmit();
 
+
+
             }
         });
     }
 
-    private void checkPermission() {
+    public void recordVideo(View view) {
+        Intent intent = new Intent(this, VideoCapture.class);
+        startActivity(intent);
+    }
+
+    public void checkPermission() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
