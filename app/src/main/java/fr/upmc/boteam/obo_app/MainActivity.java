@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkPermission();
+
         mLogin = (EditText) findViewById(R.id.et_login);
         mPass = (EditText) findViewById(R.id.et_pass);
 
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
                 client.sendAssociationRequest();
 
-                checkPermission();
+
 
                 client.testVideo(getApplicationContext());
 

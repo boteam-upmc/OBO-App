@@ -37,7 +37,7 @@ public class ClientCallback {
     public static Client socket;
     {
         //final String SERVER_ADDRESS = "xxx.xxx.xx.xx";
-        final String LOCAL_ADDRESS = "192.168.43.250";
+        final String LOCAL_ADDRESS = "192.168.43.187"; //192.168.43.250
         final int PORT = 3000;
 
         this.socket = new Client(LOCAL_ADDRESS, PORT);
