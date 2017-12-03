@@ -12,6 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.view.LayoutInflater;
+import android.support.design.widget.Snackbar;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.Settings;
 
 import java.util.UUID;
 
@@ -25,12 +31,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 112;
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 113;
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 114;
-
+    RelativeLayout  containerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        containerView = this.containerView;
         checkPermission();
 
         mLogin = (EditText) findViewById(R.id.et_login);
@@ -65,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                client.testEmit();
+                //   client.testEmit();
 
                 recordVideo(v);
             }
@@ -78,46 +85,63 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkPermission() {
+        //permission about storage
+
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+
+            if(!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                Log.e("WRITE_EXTERNAL_STORAGE", "permission denied");
-            }else{
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+
+                explain(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
+
+            }else{
+                askPermission( new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
             }
         }
 
-        if(ContextCompat.checkSelfPermission(this,
-                Manifest.permission.RECORD_AUDIO)
+        //else{
+        //  askPermission( new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+        //       MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);}
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+            if(!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.RECORD_AUDIO)){
-                Log.e("RECORD_AUDIO", "permission denied");
+
+                explain(new String[]{Manifest.permission.RECORD_AUDIO},
+                        MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+                //  Log.e("RECORD_AUDIO", "permission denied");
+
+
             }else{
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.RECORD_AUDIO},
+
+                askPermission(new String[]{Manifest.permission.RECORD_AUDIO},
                         MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
             }
-        }
+        }/*else  askPermission(new String[]{Manifest.permission.RECORD_AUDIO},
+                MY_PERMISSIONS_REQUEST_RECORD_AUDIO);*/
 
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+
+            if(!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.CAMERA)){
-                Log.e("CAMERA", "permission denied");
+                explain(new String[]{Manifest.permission.CAMERA},MY_PERMISSIONS_REQUEST_CAMERA);
             }else{
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA},
                         MY_PERMISSIONS_REQUEST_CAMERA);
+                askPermission(new String[]{Manifest.permission.CAMERA},MY_PERMISSIONS_REQUEST_CAMERA);
             }
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
@@ -125,6 +149,59 @@ public class MainActivity extends AppCompatActivity {
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
         }
     }
+
+    /* @Override
+     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+     {
+         if (requestCode == MY_PERMISSIONS_REQUEST_CAMERA)
+         {
+             if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+             {
+                 if (!ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA))
+                 {
+                     displayOptions();
+                 }
+                 else
+                 {
+                     explain(new String[]{Manifest.permission.CAMERA},MY_PERMISSIONS_REQUEST_CAMERA);
+                 }
+             }
+
+         }
+
+         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+     }*/
+    private void explain(final String[] permissions, final int permissionCode)
+    {
+        Snackbar.make(containerView,"Cette permission est nécessaire",Snackbar.LENGTH_LONG).setAction("Activé", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                askPermission(permissions,permissionCode);
+            }
+        }).show();
+
+
+    }
+
+    public void askPermission(String[] permissions,int permissionCode){
+        ActivityCompat.requestPermissions(this,
+                permissions,
+                permissionCode);
+    }
+
+  /*  private void displayOptions()
+    {
+        Snackbar.make(containerView, "Vous avez désactivé la permission", Snackbar.LENGTH_LONG)
+                .setAction("Paramètres", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        final Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    }
+                }).show();
+    }*/
 
     @Override
     protected void onDestroy() {
