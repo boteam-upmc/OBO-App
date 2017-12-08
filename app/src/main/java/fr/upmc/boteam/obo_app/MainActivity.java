@@ -3,7 +3,6 @@ package fr.upmc.boteam.obo_app;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +11,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    ClientCallback client;
+    String SERVER_ADDRESS = "192.168.1.89";
+    int SERVER_PORT = 3000;
+
+    public static Client socket;
 
     private EditText mLogin;
     private EditText mPass;
@@ -31,41 +32,58 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        System.out.println("MAIN_ FIRST");
         checkPermission();
 
         mLogin = (EditText) findViewById(R.id.et_login);
         mPass = (EditText) findViewById(R.id.et_pass);
 
-        client = new ClientCallback();
+        socket = new Client(SERVER_ADDRESS, SERVER_PORT);
 
-        client.connect();
-        client.callback();
+        socket.setClientCallback(new Client.ClientCallback() {
 
-        Button mOk = (Button) findViewById(R.id.bt_login);
+            public void onMessage(String message) {
+                socket.receivedMessage(message);
+            }
+
+            public void onConnect() {
+                Log.i(socket.delegate.getLOG_TAG(), "Client connected.");
+            }
+
+            public void onDisconnect(String message) {
+                Log.i(socket.delegate.getLOG_TAG(), "Client disconnected.");
+                socket.disconnect();
+            }
+
+            public void onConnectError(String message) {
+                Log.i(socket.delegate.getLOG_TAG(), "Connection error. " + message);
+                socket.disconnect();
+            }
+
+        });
+
+        System.out.println("MAIN_ before connect");
+        socket.connect();
+
+        System.out.println("MAIN_ end connect");
+
+        Button mOk = findViewById(R.id.bt_login);
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                client.setUser(
+                socket.set_User_Robot(
                         String.valueOf(mLogin.getText()),
-                        String.valueOf(mPass.getText())
-                );
+                        String.valueOf(mPass.getText()),
+                        UUID.randomUUID().toString());
 
-                client.setRobot(UUID.randomUUID().toString());
-
-                client.sendAssociationRequest();
-
-
-
-                client.testVideo(getApplicationContext());
+                socket.sendAssociationRequest();
 
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                client.testEmit();
 
                 recordVideo(v);
             }
@@ -119,16 +137,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        client.disconnect();
+        socket.disconnect();
     }
 }

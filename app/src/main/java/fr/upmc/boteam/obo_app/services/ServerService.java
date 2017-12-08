@@ -8,12 +8,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 
 import fr.upmc.boteam.obo_app.Client;
-import fr.upmc.boteam.obo_app.ClientCallback;
+import fr.upmc.boteam.obo_app.MainActivity;
 
 
 /**
@@ -38,7 +35,7 @@ public class ServerService extends IntentService {
 
     public static final String path = "/storage/emulated/0/OBOApp/";
 
-    private Client client = ClientCallback.socket;
+    Client client = MainActivity.socket;
     FileInputStream fis = null;
     BufferedInputStream bis = null;
 

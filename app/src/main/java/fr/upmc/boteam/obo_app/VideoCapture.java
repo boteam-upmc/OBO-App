@@ -138,6 +138,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
             // Let's initRecorder so we can record again
             initRecorder("VIDEO_" + recordsCounter / 2);
             prepareRecorder();
+            Client.delegate.testVideo(getApplicationContext());
 
         } else {
             Log.i(LOG_TAG, "START");
