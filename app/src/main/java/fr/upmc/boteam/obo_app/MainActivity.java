@@ -15,10 +15,10 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    String SERVER_ADDRESS = "192.168.1.89";
+    String SERVER_ADDRESS = "192.168.43.250";
     int SERVER_PORT = 3000;
 
-    public static Client socket;
+    public static Client client;
 
     private EditText mLogin;
     private EditText mPass;
@@ -32,52 +32,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        System.out.println("MAIN_ FIRST");
         checkPermission();
 
         mLogin = (EditText) findViewById(R.id.et_login);
         mPass = (EditText) findViewById(R.id.et_pass);
 
-        socket = new Client(SERVER_ADDRESS, SERVER_PORT);
+        client = new Client(SERVER_ADDRESS, SERVER_PORT);
 
-        socket.setClientCallback(new Client.ClientCallback() {
-
-            public void onMessage(String message) {
-                socket.receivedMessage(message);
-            }
-
-            public void onConnect() {
-                Log.i(socket.delegate.getLOG_TAG(), "Client connected.");
-            }
-
-            public void onDisconnect(String message) {
-                Log.i(socket.delegate.getLOG_TAG(), "Client disconnected.");
-                socket.disconnect();
-            }
-
-            public void onConnectError(String message) {
-                Log.i(socket.delegate.getLOG_TAG(), "Connection error. " + message);
-                socket.disconnect();
-            }
-
-        });
-
-        System.out.println("MAIN_ before connect");
-        socket.connect();
-
-        System.out.println("MAIN_ end connect");
+        client.connect();
 
         Button mOk = findViewById(R.id.bt_login);
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                socket.set_User_Robot(
+                client.delegate.set_User_Robot(
                         String.valueOf(mLogin.getText()),
                         String.valueOf(mPass.getText()),
                         UUID.randomUUID().toString());
 
-                socket.sendAssociationRequest();
+                client.delegate.sendAssociationRequest();
 
                 try {
                     Thread.sleep(500);
@@ -139,6 +113,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        socket.disconnect();
+        client.onDisconnect();
     }
 }
