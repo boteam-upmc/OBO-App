@@ -21,10 +21,10 @@ public class ServerService extends IntentService {
     private static final String LOG_TAG = "ServerService";
 
     public static final String ACTION_SEND_VIDEO = "fr.upmc.boteam.obo_app.services.action.SEND_VIDEO";
+    public static final String ACTION_SEND_MESSAGE = "fr.upmc.boteam.obo_app.services.action.SEND_MESSAGE";
 
     public static final String EXTRA_VIDEO = "fr.upmc.boteam.obo_app.services.extra.VIDEO";
-
-
+    public static final String EXTRA_MESSAGE = "fr.upmc.boteam.obo_app.services.extra.MESSAGE";
 
     public static final String path = "/storage/emulated/0/OBOApp/";
 
@@ -38,14 +38,18 @@ public class ServerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+
             final String action = intent.getAction();
 
+            assert action != null;
             switch (action) {
                 case ACTION_SEND_VIDEO:
-                    final String param = intent.getStringExtra(EXTRA_VIDEO);
-                    handleActionSendVideo(param);
-                    Log.i(LOG_TAG, "SUCCESS");
+                    handleActionSendVideo(intent.getStringExtra(EXTRA_VIDEO));
+                    Log.i(LOG_TAG, "ACTION_SEND_VIDEO");
                     break;
+                case ACTION_SEND_MESSAGE:
+                    handleActionSendMessage(intent.getStringArrayExtra(EXTRA_MESSAGE));
+                    Log.i(LOG_TAG, "ACTION_SEND_MESSAGE");
             }
         }
     }
@@ -55,21 +59,38 @@ public class ServerService extends IntentService {
      * parameter.
      */
     private void handleActionSendVideo(String param) {
-        if(param != null) {
-            String videoPath = path + param + ".mp4";
-            int n;
-            try {
-                File file = new File(videoPath);
-                byte[] buffer = new byte[(int)file.length()];
-                fis = new FileInputStream(file);
-                bis = new BufferedInputStream(fis);
-                System.out.println("Sending " + videoPath + "(" + buffer.length + " bytes)");
-                while((n = bis.read(buffer,0,buffer.length)) != -1){
-                    Client.delegate.emitVideo(buffer, n);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+        String videoPath = path + param + ".mp4";
+        int n;
+
+        try {
+            File file = new File(videoPath);
+            byte[] buffer = new byte[(int)file.length()];
+            fis = new FileInputStream(file);
+            bis = new BufferedInputStream(fis);
+            System.out.println("Sending " + videoPath + "(" + buffer.length + " bytes)");
+            while((n = bis.read(buffer,0,buffer.length)) != -1) {
+                Client.socket.getOutputStream().write(buffer, 0, n);
+                Client.socket.getOutputStream().flush();
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle action Send Message in the provided background thread with the provided
+     * parameter.
+     */
+    private void handleActionSendMessage(String[] message) {
+
+        try {
+            Client.socket.getOutputStream().write((message[0] + "/" + message[1]).getBytes());
+            Client.socket.getOutputStream().flush();
+
+        } catch (IOException e) {
+            Log.i(LOG_TAG, "SENDMESSAGE " + e.getMessage());
         }
     }
 }

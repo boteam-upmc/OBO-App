@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    String SERVER_ADDRESS = "192.168.43.250";
+    String SERVER_ADDRESS = "192.168.1.34";
     int SERVER_PORT = 3000;
 
     public static Client client;
@@ -46,12 +46,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                client.delegate.set_User_Robot(
+                Client.delegate.set_User_Robot(
                         String.valueOf(mLogin.getText()),
                         String.valueOf(mPass.getText()),
                         UUID.randomUUID().toString());
 
-                client.delegate.sendAssociationRequest();
+                Client.delegate.sendAssociationRequest(getApplicationContext());
 
                 try {
                     Thread.sleep(500);
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    void testEmit() { Client.delegate.sendMessage(getApplicationContext(),"onVideo", "EOF"); }
 
     public void recordVideo(View view) {
         Intent intent = new Intent(this, VideoCapture.class);

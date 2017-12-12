@@ -1,6 +1,5 @@
 package fr.upmc.boteam.obo_app;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -16,18 +15,19 @@ import fr.upmc.boteam.obo_app.interfaces.IClientCallback;
 
 public class Client implements IClientCallback {
 
-    static Socket socket;
-    static OutputStream socketOutput;
-    static BufferedReader socketInput;
+    public static Socket socket;
+    private static OutputStream socketOutput;
+    private static BufferedReader socketInput;
 
     private String ip;
     private int port;
 
     private static final String LOG_TAG = "Client";
+
     static HashMap<String, Object> messages = new HashMap<>();
     static boolean isRobotAccepted = false;
 
-    public static DelegateClient delegate;
+    static DelegateClient delegate;
 
     Client(String ip, int port) {
         this.ip = ip;
@@ -58,35 +58,35 @@ public class Client implements IClientCallback {
     }
 
     public void onConnect() {
-        Log.i(this.LOG_TAG, "Client connected.");
+        Log.i(LOG_TAG, "Client connected.");
     }
 
     public void onMessage(String message) {
 
         if (message.startsWith("ANDROID/")) {
-            Log.i(this.LOG_TAG, message);
+            Log.i(LOG_TAG, message);
 
         } else if (message.startsWith("VALID/")) {
 
             if (message.contains("T")) {
                 delegate.setRobotAccepted(true);
-                Log.i(this.LOG_TAG, "isRobotAccepted=" + true);
+                Log.i(LOG_TAG, "isRobotAccepted=" + true);
 
             } else if (message.contains("F")) {
                 delegate.setRobotAccepted(false);
-                Log.i(this.LOG_TAG, "isRobotAccepted=" + false);
+                Log.i(LOG_TAG, "isRobotAccepted=" + false);
 
             } else {
                 delegate.setRobotAccepted(false);
-                Log.i(this.LOG_TAG, "Unknown : " + message);
+                Log.i(LOG_TAG, "Unknown : " + message);
             }
         } else {
-            Log.i(this.LOG_TAG, "NOT HANDLED MESSAGE : " + message);
+            Log.i(LOG_TAG, "NOT HANDLED MESSAGE : " + message);
         }
     }
 
     public void onDisconnect() {
-        Log.i(this.LOG_TAG, "Client disconnected.");
+        Log.i(LOG_TAG, "Client disconnected.");
         try {
             if(socket != null) { socket.close(); }
 
@@ -96,7 +96,7 @@ public class Client implements IClientCallback {
     }
 
     public void onConnectError(String message) {
-        Log.i(this.LOG_TAG, "Connection error. " + message);
+        Log.i(LOG_TAG, "Connection error. " + message);
         onDisconnect();
     }
 
@@ -105,12 +105,14 @@ public class Client implements IClientCallback {
         public void run() {
             String message;
 
+            //noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     // !!! each line must end with a \n to be received !!!
                     while ((message = socketInput.readLine()) != null) { onMessage(message); }
                 } catch (IOException e) {
                     Log.i("RECEIVEDTHREAD", e.getMessage());
+                    break;
                 }
             }
         }
