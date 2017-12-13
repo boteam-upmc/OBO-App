@@ -133,7 +133,6 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
             // Let's initRecorder so we can record again
             initRecorder("VIDEO_" + recordsCounter / 2);
             prepareRecorder();
-            Client.delegate.sendVideo(getApplicationContext());
 
         } else {
             Log.i(LOG_TAG, "START");
@@ -166,6 +165,9 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
 
                 if (recordsCounter % 2 == 0) {
                     Log.i(LOG_TAG, "Record n°" + ((recordsCounter / 2) - 1) + " saved.");
+
+                    Client.delegate.sendVideo(getApplicationContext());
+
                     cameraView.performClick();
                     cameraView.performClick();
 
