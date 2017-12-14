@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    String SERVER_ADDRESS = "192.168.43.250";
+    String SERVER_ADDRESS = "192.168.43.5";
     int SERVER_PORT = 3000;
 
     public static Client client;
