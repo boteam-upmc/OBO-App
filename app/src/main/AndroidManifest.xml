@@ -22,20 +22,26 @@
         <!--Set the Activity start mode to singleTop -->
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".VideoCapture" />
+        <activity
+            android:name=".VideoCapture"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".services.ServerService"
             android:exported="false" />
 
-        <activity android:name=".Menu"></activity>
+        <activity
+            android:name=".Menu"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

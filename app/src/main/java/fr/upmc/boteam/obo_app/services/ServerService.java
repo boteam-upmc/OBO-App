@@ -72,7 +72,7 @@ public class ServerService extends IntentService {
      * parameter.
      */
     private void handleActionSendVideo(String param) {
-
+        final String videoName = param;
         String videoPath = videoDirectory + param;
         int BUFFER_LENGHT = 65000;
         int n;
@@ -106,7 +106,7 @@ public class ServerService extends IntentService {
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "Video well inserted in the database", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), videoName + " well inserted in the database", Toast.LENGTH_SHORT).show();
                     }
                 });
                 //Log.i("ServerService : ", received);
@@ -116,7 +116,7 @@ public class ServerService extends IntentService {
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "Video NOT inserted in the database", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), videoName + "Video NOT inserted in the database", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
