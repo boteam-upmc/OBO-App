@@ -3,13 +3,15 @@ package fr.upmc.boteam.obo_app;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.UUID;
 
-public class Menu extends AppCompatActivity {
+public class Menu extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,52 @@ public class Menu extends AppCompatActivity {
             }
         });
     }
+
+    /* DOUBLE CLICK TO QUIT */
+    /* ******************** */
+    long SystemTime = 0;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            if(System.currentTimeMillis()- SystemTime < 1000 && SystemTime != 0){
+                Intent intent = new Intent();
+                intent.setAction("ExitApp");
+                intent.setClass(this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }else{
+                SystemTime = System.currentTimeMillis();
+                Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+            }
+        }
+        return false;
+    }
+
+    /* SHOW ITEM TO THE APP BAR */
+    /* ************************ */
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    //handling click events
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_logout:
+                Intent intent = new Intent();
+                intent.setClass(this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

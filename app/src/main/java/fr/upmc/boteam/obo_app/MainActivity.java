@@ -57,6 +57,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /* RESTART ACTIVITY ON NEW INTENT */
+    /* ***************************** */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        if ("ExitApp".equals(intent.getAction())) {
+            finish();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
