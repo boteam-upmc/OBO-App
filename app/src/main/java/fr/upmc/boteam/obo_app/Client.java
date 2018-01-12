@@ -3,26 +3,32 @@ package fr.upmc.boteam.obo_app;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.util.HashMap;
+import java.util.List;
 
 import fr.upmc.boteam.obo_app.interfaces.IClientCallback;
+import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class Client implements IClientCallback {
 
+    public static DatagramSocket s;
+
     public static Socket socket;
-    private static OutputStream socketOutput;
     private static BufferedReader socketInput;
 
     private String ip;
     private int port;
 
-    private static final String LOG_TAG = "Client";
+    private static final String LOG_TAG = "CLIENT";
 
     static HashMap<String, Object> messages = new HashMap<>();
     static boolean isRobotAccepted = false;
@@ -30,27 +36,31 @@ public class Client implements IClientCallback {
     static DelegateClient delegate;
 
     Client(String ip, int port) {
+        try {
+            s = new DatagramSocket();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         this.ip = ip;
         this.port = port;
         Client.delegate = new DelegateClient();
     }
 
-    void connect() {
+    public void connect() {
         new Thread(new Runnable() {
             @Override
             public void run() {
 
                 try {
-                    Client.socket = new Socket();
-                    SocketAddress sockAddr = new InetSocketAddress(ip, port);
-                    socket.connect(sockAddr);
-                    socketOutput = socket.getOutputStream();
+                    socket = new Socket(InetAddress.getByName(ip), port);
                     socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                     new ReceiveThread().start();
+                    Log.i(LOG_TAG, "Client connected.");
 
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.out.println("CLIENT_ ERROR connect" + e.getMessage());
                 }
             }
@@ -87,10 +97,16 @@ public class Client implements IClientCallback {
 
     public void onDisconnect() {
         Log.i(LOG_TAG, "Client disconnected.");
-        try {
-            if(socket != null) { socket.close(); }
 
-        } catch (IOException e) {
+        List<File> videoListFiles = DelegateClient.getVideoListFiles(new File(ServerService.videoDirectory));
+        for(int i = 0; i < videoListFiles.size(); i++) {
+            videoListFiles.get(i).delete();
+        }
+
+        try {
+            socket.close();
+
+        } catch (Exception e) {
             Log.i("DISCONNECT", e.getMessage());
         }
     }
@@ -100,20 +116,20 @@ public class Client implements IClientCallback {
         onDisconnect();
     }
 
+    public boolean isConnected() {
+        return Client.socket != null;
+    }
+
     private class ReceiveThread extends Thread implements Runnable {
 
         public void run() {
             String message;
 
-            //noinspection InfiniteLoopStatement
-            while (true) {
-                try {
-                    // !!! each line must end with a \n to be received !!!
-                    while ((message = socketInput.readLine()) != null) { onMessage(message); }
-                } catch (IOException e) {
-                    Log.i("RECEIVEDTHREAD", e.getMessage());
-                    break;
-                }
+            try {
+                // !!! each line must end with a \n to be received !!!
+                while ((message = socketInput.readLine()) != null || isConnected()) { onMessage(message); }
+            } catch (Exception e) {
+                Log.i("RECEIVEDTHREAD", e.getMessage());
             }
         }
     }

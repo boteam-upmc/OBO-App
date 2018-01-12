@@ -24,6 +24,8 @@ import android.view.WindowManager;
 import java.io.File;
 import java.io.IOException;
 
+import fr.upmc.boteam.obo_app.services.ServerService;
+
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED;
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_UNKNOWN;
@@ -72,8 +74,6 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         cameraView.setOnClickListener(this);
 
         sharedPref = getSharedPreferences(MY_PREFERENCES, Context.MODE_PRIVATE);
-
-        //mContext = getApplicationContext();
     }
 
     private void initRecorder(String recordName) {
@@ -117,7 +117,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         try {
             recorder.prepare();
 
-        } catch (IllegalStateException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             finish();
         }
@@ -166,16 +166,13 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
                 if (recordsCounter % 2 == 0) {
                     Log.i(LOG_TAG, "Record n°" + ((recordsCounter / 2) - 1) + " saved.");
 
-                    Client.delegate.sendVideo(getApplicationContext());
-
                     cameraView.performClick();
                     cameraView.performClick();
 
                     String path = Environment.getExternalStorageDirectory() + "/OBOApp/VIDEO_" + ((recordsCounter / 2) - 1) + ".mp4";
                     Log.i(LOG_TAG, path);
-                    Client.delegate.sendVideo(getApplicationContext());
 
-                    //createVideoThumbnail(mContext, Uri.fromFile(new File(path)));
+                    //createVideoThumbnail(mContext, Uri.fromFile(new File(videoDirectory)));
                 }
                 break;
 

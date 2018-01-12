@@ -15,13 +15,19 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    String SERVER_ADDRESS = "192.168.43.250";
+    //public static String SERVER_ADDRESS = "192.168.43.250";
+    //public static String SERVER_ADDRESS = "192.168.1.89";
+    //public static String SERVER_ADDRESS = "192.168.1.34";
+    //public static String SERVER_ADDRESS = "192.168.1.22";
+    public static String SERVER_ADDRESS = "192.168.43.250";
+
+    public static int UDP_PORT = 3001;
     int SERVER_PORT = 3000;
 
     public static Client client;
 
-    private EditText mLogin;
-    private EditText mPass;
+    public static EditText mLogin;
+    public static EditText mPass;
 
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 112;
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 113;
@@ -34,43 +40,42 @@ public class MainActivity extends AppCompatActivity {
 
         checkPermission();
 
-        mLogin = (EditText) findViewById(R.id.et_login);
-        mPass = (EditText) findViewById(R.id.et_pass);
+        mLogin = /*(EditText)*/ findViewById(R.id.et_login);
+        mPass = /*(EditText)*/ findViewById(R.id.et_pass);
 
         client = new Client(SERVER_ADDRESS, SERVER_PORT);
 
-        client.connect();
+
 
         Button mOk = findViewById(R.id.bt_login);
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Client.delegate.set_User_Robot(
-                        String.valueOf(mLogin.getText()),
-                        String.valueOf(mPass.getText()),
-                        UUID.randomUUID().toString());
-
-                Client.delegate.sendAssociationRequest(getApplicationContext());
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                recordVideo(v);
+                client.connect();
+                menu(v);
             }
         });
     }
 
-    void testEmit() { Client.delegate.sendMessage(getApplicationContext(),"onVideo", "EOF"); }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        client.onDisconnect();
+    }
 
-    public void recordVideo(View view) {
-        Intent intent = new Intent(this, VideoCapture.class);
+    /* ACTIVITY MENU */
+    /* ************* */
+    public void menu(View view) {
+        Intent intent = new Intent(this, Menu.class);
         startActivity(intent);
     }
 
+    /* FUNCTION TEST */
+    /* ************* */
+    void testEmit() { Client.delegate.sendMessage(getApplicationContext(),"onVideo", "EOF"); }
+
+    /* CHECK FOR PERMISSION */
+    /* ******************** */
     public void checkPermission() {
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -110,11 +115,5 @@ public class MainActivity extends AppCompatActivity {
                         MY_PERMISSIONS_REQUEST_CAMERA);
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        client.onDisconnect();
     }
 }

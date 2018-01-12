@@ -26,11 +26,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".VideoCapture"/>
+        <activity android:name=".VideoCapture" />
 
         <service
             android:name=".services.ServerService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity android:name=".Menu"></activity>
     </application>
 
 </manifest>

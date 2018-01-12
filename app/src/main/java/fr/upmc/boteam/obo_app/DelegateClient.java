@@ -2,7 +2,17 @@ package fr.upmc.boteam.obo_app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import fr.upmc.boteam.obo_app.services.ServerService;
 
@@ -16,9 +26,6 @@ import static fr.upmc.boteam.obo_app.services.ServerService.ACTION_SEND_VIDEO;
 import static fr.upmc.boteam.obo_app.services.ServerService.EXTRA_VIDEO;
 
 class DelegateClient {
-
-    // unique id for video
-    private int counter = 0;
 
     // content of events
     public static class Event {
@@ -63,14 +70,37 @@ class DelegateClient {
         sendMessage(c, Event.LOGIN, Client.delegate.toJsonFormat(Client.messages));
     }
 
+    /* SEND VIDEO */
+    /* ********** */
+
+    void sendingAllVideos(Context appContext) {
+        List<File> videoListFiles = getVideoListFiles(new File(ServerService.videoDirectory));
+        for(int i = 0; i < videoListFiles.size(); i++) {
+            sendVideo(appContext, videoListFiles.get(i).getName());
+        }
+    }
+
+    static List<File> getVideoListFiles(File parentDir) {
+        List<File> videoFiles = new ArrayList<>();
+        Queue<File> files = new LinkedList<>();
+        files.addAll(Arrays.asList(parentDir.listFiles()));
+        while (!files.isEmpty()) {
+            File file = files.remove();
+            if (file.getName().endsWith(".mp4")) {
+                videoFiles.add(file);
+            }
+        }
+        //videoFiles.remove(0);
+        return videoFiles;
+    }
+
     /* SERVERSERVICE FONCTION */
     /* ********************** */
 
-    void sendVideo(Context appContext) {
+    private void sendVideo(Context appContext, String videoName) {
         Intent intent = new Intent(appContext, ServerService.class);
         intent.setAction(ACTION_SEND_VIDEO);
-        intent.putExtra(EXTRA_VIDEO, "VIDEO_" + counter);
-        counter++;
+        intent.putExtra(EXTRA_VIDEO, videoName);
         appContext.startService(intent);
     }
 
