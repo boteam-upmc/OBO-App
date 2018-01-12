@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,7 @@ import android.view.WindowManager;
 import java.io.File;
 import java.io.IOException;
 
+import fr.upmc.boteam.obo_app.services.LogoutDialog;
 import fr.upmc.boteam.obo_app.services.ServerService;
 
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
@@ -254,10 +256,9 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_logout:
-                Intent intent = new Intent();
-                intent.setClass(this,MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                DialogFragment dialogFragment = LogoutDialog.newInstance("logout");
+                dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

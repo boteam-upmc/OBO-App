@@ -1,6 +1,7 @@
 package fr.upmc.boteam.obo_app;
 
 import android.content.Intent;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -10,6 +11,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.UUID;
+
+import fr.upmc.boteam.obo_app.services.LogoutDialog;
 
 public class Menu extends AppCompatActivity{
 
@@ -54,11 +57,8 @@ public class Menu extends AppCompatActivity{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){
             if(System.currentTimeMillis()- SystemTime < 1000 && SystemTime != 0){
-                Intent intent = new Intent();
-                intent.setAction("ExitApp");
-                intent.setClass(this,MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                DialogFragment dialogFragment = LogoutDialog.newInstance("ExitApp");
+                dialogFragment.show(this.getSupportFragmentManager(), "dialog");
             }else{
                 SystemTime = System.currentTimeMillis();
                 Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
@@ -82,10 +82,8 @@ public class Menu extends AppCompatActivity{
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_logout:
-                Intent intent = new Intent();
-                intent.setClass(this,MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                DialogFragment dialogFragment = LogoutDialog.newInstance("logout");
+                dialogFragment.show(this.getSupportFragmentManager(), "dialog");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
