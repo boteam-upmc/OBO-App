@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     //public static String SERVER_ADDRESS = "192.168.43.250";
     //public static String SERVER_ADDRESS = "192.168.1.89";
     //public static String SERVER_ADDRESS = "192.168.1.34";
-    //public static String SERVER_ADDRESS = "192.168.1.22";
     public static String SERVER_ADDRESS = "192.168.43.250";
 
     public static int UDP_PORT = 3001;
