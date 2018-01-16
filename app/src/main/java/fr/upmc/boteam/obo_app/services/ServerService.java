@@ -109,14 +109,15 @@ public class ServerService extends IntentService {
                         Toast.makeText(getApplicationContext(), videoName + " well inserted in the database", Toast.LENGTH_SHORT).show();
                     }
                 });
-                //Log.i("ServerService : ", received);
-                //videoFile.delete();
+
+                videoFile.delete();
+
             } else {
 
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), videoName + "Video NOT inserted in the database", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), videoName + " NOT inserted in the database", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

@@ -2,7 +2,6 @@ package fr.upmc.boteam.obo_app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,8 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import fr.upmc.boteam.obo_app.services.ServerService;
 
