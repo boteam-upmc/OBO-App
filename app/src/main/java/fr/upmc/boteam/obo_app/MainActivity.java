@@ -11,11 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    String SERVER_ADDRESS = "192.168.43.5";
+    String SERVER_ADDRESS = "192.168.1.91";
     int SERVER_PORT = 3000;
 
     public static Client client;
@@ -37,38 +39,50 @@ public class MainActivity extends AppCompatActivity {
         mLogin = (EditText) findViewById(R.id.et_login);
         mPass = (EditText) findViewById(R.id.et_pass);
 
-        client = new Client(SERVER_ADDRESS, SERVER_PORT);
+        client = new Client(SERVER_ADDRESS, SERVER_PORT,this);
 
         client.connect();
+        Log.i("sidi","CLIENT_ MainActivity "+client.isServerRechable);
 
         Button mOk = findViewById(R.id.bt_login);
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(client.isServerRechable){
+                    Client.delegate.set_User_Robot(
+                            String.valueOf(mLogin.getText()),
+                            String.valueOf(mPass.getText()),
+                            UUID.randomUUID().toString());
 
-                Client.delegate.set_User_Robot(
-                        String.valueOf(mLogin.getText()),
-                        String.valueOf(mPass.getText()),
-                        UUID.randomUUID().toString());
+                    Client.delegate.sendAssociationRequest(getApplicationContext());
 
-                Client.delegate.sendAssociationRequest(getApplicationContext());
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("sidi","CLIENT_ MainActivity ISidentified "+client.isUserIdentified);
+                   // recordVideo();
+                }else{
 
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Server unreachable",
+                               Toast.LENGTH_LONG).show();
                 }
-
-                recordVideo(v);
             }
         });
     }
 
     void testEmit() { Client.delegate.sendMessage(getApplicationContext(),"onVideo", "EOF"); }
 
-    public void recordVideo(View view) {
-        Intent intent = new Intent(this, VideoCapture.class);
-        startActivity(intent);
+    public void recordVideo(boolean isUserIdentified) {
+        if(isUserIdentified){
+            Intent intent = new Intent(this, VideoCapture.class);
+            startActivity(intent);
+        }else{
+          //  Toast.makeText(this, "Wrong password or Log in",
+            //        Toast.LENGTH_LONG).show();
+        }
+
     }
 
     public void checkPermission() {

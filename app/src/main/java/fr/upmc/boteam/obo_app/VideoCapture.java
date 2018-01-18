@@ -1,7 +1,9 @@
 package fr.upmc.boteam.obo_app;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -20,6 +22,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +43,15 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
 
     private SharedPreferences sharedPref;
 
+    //ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();
+
     //private Context mContext;
 
     private int recordsCounter;
     private SurfaceView cameraView;
     private MediaRecorder recorder;
     private SurfaceHolder holder;
+    private Button decon;
     private boolean recording;
     {
         recordsCounter = 0;
@@ -73,7 +79,20 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
 
         sharedPref = getSharedPreferences(MY_PREFERENCES, Context.MODE_PRIVATE);
 
+        decon=(Button)findViewById(R.id.decon);
+        decon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deconnexion();
+            }
+        });
         //mContext = getApplicationContext();
+    }
+
+
+    public void deconnexion(){
+        Intent in = new Intent(this,MainActivity.class);
+        startActivity(in);
     }
 
     private void initRecorder(String recordName) {
@@ -239,4 +258,11 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         }
         return bitmap;
     }
+    private ActivityManager.MemoryInfo getAvailableMemory() {
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
+    }
+
 }

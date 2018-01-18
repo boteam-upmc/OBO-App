@@ -1,6 +1,9 @@
 package fr.upmc.boteam.obo_app;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,40 +24,37 @@ public class Client implements IClientCallback {
 
     private String ip;
     private int port;
+    private MainActivity mainActivity;
+  //  Context context;
+    static boolean isServerRechable=true;
+    static boolean isUserIdentified=false;
 
     private static final String LOG_TAG = "Client";
-
     static HashMap<String, Object> messages = new HashMap<>();
     static boolean isRobotAccepted = false;
 
     static DelegateClient delegate;
 
-    Client(String ip, int port) {
+    Client(String ip, int port,MainActivity mainActivity) {
         this.ip = ip;
         this.port = port;
+        this.mainActivity=mainActivity;
         Client.delegate = new DelegateClient();
     }
 
     void connect() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
 
-                try {
-                    Client.socket = new Socket();
-                    SocketAddress sockAddr = new InetSocketAddress(ip, port);
-                    socket.connect(sockAddr);
-                    socketOutput = socket.getOutputStream();
-                    socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        Thread t = new StartedThread();
+        t.start();
+        try {
+            Log.i(LOG_TAG, "CLIENT_ ERROR debut join= "+isServerRechable);
+            t.join();
+            Log.i(LOG_TAG, "CLIENT_ ERROR fin join= "+isServerRechable);
 
-                    new ReceiveThread().start();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-
-                } catch (IOException e) {
-                    System.out.println("CLIENT_ ERROR connect" + e.getMessage());
-                }
-            }
-        }).start();
     }
 
     public void onConnect() {
@@ -80,7 +80,17 @@ public class Client implements IClientCallback {
                 delegate.setRobotAccepted(false);
                 Log.i(LOG_TAG, "Unknown : " + message);
             }
-        } else {
+        } else if (message.equals("identified")) {
+            //delegate.setRobotAccepted(false);
+            isUserIdentified=true;
+            mainActivity.recordVideo(isUserIdentified);
+            Log.i(LOG_TAG, "identified=");
+        } else if (message.equals("Notidentified")) {
+            //delegate.setRobotAccepted(false);
+            isUserIdentified=false;
+            mainActivity.recordVideo(isUserIdentified);
+            Log.i(LOG_TAG, "identified=");
+        }else {
             Log.i(LOG_TAG, "NOT HANDLED MESSAGE : " + message);
         }
     }
@@ -109,11 +119,39 @@ public class Client implements IClientCallback {
             while (true) {
                 try {
                     // !!! each line must end with a \n to be received !!!
-                    while ((message = socketInput.readLine()) != null) { onMessage(message); }
+                    while ((message = socketInput.readLine()) != null) {
+                        Log.i("RECEIVEDTHREAD", "message "+message);
+                    onMessage(message); }
+
+
                 } catch (IOException e) {
                     Log.i("RECEIVEDTHREAD", e.getMessage());
                     break;
                 }
+            }
+        }
+    }
+    private class StartedThread extends Thread implements Runnable {
+
+
+        public void run() {
+            try {
+                Client.socket = new Socket();
+                SocketAddress sockAddr = new InetSocketAddress(ip, port);
+                socket.connect(sockAddr);
+                socketOutput = socket.getOutputStream();
+                socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                new ReceiveThread().start();
+
+
+            } catch (Exception e) {
+
+                Client.isServerRechable=false;
+                Log.i(LOG_TAG, "CLIENT_ ERROR CLIENT= "+isServerRechable + e.getMessage());
+                // System.out.println("CLIENT_ ERROR connect" + e.getMessage());
+               // Toast.makeText(context.getApplicationContext(), "Server inaccessible ",
+                     //   Toast.LENGTH_LONG).show();
             }
         }
     }
