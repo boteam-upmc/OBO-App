@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">OBO-App</string>
+    <string name="menu_userStory">Help</string>
+    <string name="menu_logout">Logout</string>
 </resources>
