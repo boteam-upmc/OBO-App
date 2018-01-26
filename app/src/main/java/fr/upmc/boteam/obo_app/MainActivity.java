@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    String SERVER_ADDRESS = "192.168.1.91";
+    String SERVER_ADDRESS = "134.157.252.168";
     int SERVER_PORT = 3000;
 
     public static Client client;
@@ -78,10 +78,10 @@ public class MainActivity extends AppCompatActivity {
         if(isUserIdentified){
             Intent intent = new Intent(this, VideoCapture.class);
             startActivity(intent);
-        }else{
+        }//else{
           //  Toast.makeText(this, "Wrong password or Log in",
             //        Toast.LENGTH_LONG).show();
-        }
+       // }
 
     }
 
