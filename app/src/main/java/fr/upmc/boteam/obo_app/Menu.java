@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.UUID;
 
 import fr.upmc.boteam.obo_app.services.LogoutDialog;
+import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class Menu extends AppCompatActivity{
 
@@ -29,7 +30,7 @@ public class Menu extends AppCompatActivity{
                         String.valueOf(MainActivity.mLogin.getText()),
                         String.valueOf(MainActivity.mPass.getText()),
                         UUID.randomUUID().toString());
-
+                ServerService.isOnlogin=false;
                 Client.delegate.sendAssociationRequest(getApplicationContext());
 
                 Toast.makeText(getApplicationContext(), "Sending association request", Toast.LENGTH_SHORT).show();

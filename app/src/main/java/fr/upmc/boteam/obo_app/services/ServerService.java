@@ -39,6 +39,7 @@ public class ServerService extends IntentService {
 
     public static final String videoDirectory = "/storage/emulated/0/OBOApp/";
 
+    public  static boolean  isOnlogin=false;
     FileInputStream fis = null;
     BufferedInputStream bis = null;
 
@@ -117,6 +118,7 @@ public class ServerService extends IntentService {
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
+
                         Toast.makeText(getApplicationContext(), videoName + " NOT inserted in the database", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -144,6 +146,7 @@ public class ServerService extends IntentService {
             new Handler(getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    if(!isOnlogin)
                     Toast.makeText(getApplicationContext(), "Association request sent", Toast.LENGTH_SHORT).show();
                 }
             });

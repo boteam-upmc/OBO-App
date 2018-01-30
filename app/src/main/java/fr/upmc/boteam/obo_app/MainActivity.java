@@ -1,6 +1,7 @@
 package fr.upmc.boteam.obo_app;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -11,14 +12,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import java.util.UUID;
+
+import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class MainActivity extends AppCompatActivity {
 
     //public static String SERVER_ADDRESS = "192.168.43.250";
     //public static String SERVER_ADDRESS = "192.168.1.89";
     //public static String SERVER_ADDRESS = "192.168.1.34";
-    public static String SERVER_ADDRESS = "192.168.43.250";
+    public static String SERVER_ADDRESS = "192.168.1.91";
 
     public static int UDP_PORT = 3001;
     int SERVER_PORT = 3000;
@@ -43,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         mPass = /*(EditText)*/ findViewById(R.id.et_pass);
 
         client = new Client(SERVER_ADDRESS, SERVER_PORT);
-
+        client.mainActivity=this;
+        client.mainContext=this;
 
 
         Button mOk = findViewById(R.id.bt_login);
@@ -51,7 +57,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 client.connect();
-                menu(v);
+                if(Client.isServerRechable){
+                    Client.delegate.set_User_Robot(
+                            String.valueOf(mLogin.getText()),
+                            String.valueOf(mPass.getText()),
+                            UUID.randomUUID().toString());
+                    ServerService.isOnlogin=true;
+                    Client.delegate.sendAssociationRequest(getApplicationContext());
+
+                 }else{
+
+                Toast.makeText(getApplicationContext(), "Server unreachable",
+                        Toast.LENGTH_LONG).show();
+            }
             }
         });
     }
@@ -75,9 +93,13 @@ public class MainActivity extends AppCompatActivity {
 
     /* ACTIVITY MENU */
     /* ************* */
-    public void menu(View view) {
-        Intent intent = new Intent(this, Menu.class);
-        startActivity(intent);
+    public void menu(boolean isUserIdentified, Context c) {
+        if(isUserIdentified) {
+            Intent intent = new Intent(this, Menu.class);
+            startActivity(intent);
+        }else {
+            Toast.makeText(c,"Wrong login or psw",Toast.LENGTH_LONG).show();
+        }
     }
 
     /* FUNCTION TEST */

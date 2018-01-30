@@ -1,5 +1,6 @@
 package fr.upmc.boteam.obo_app;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -21,18 +22,19 @@ import fr.upmc.boteam.obo_app.services.ServerService;
 public class Client implements IClientCallback {
 
     public static DatagramSocket s;
-
+    public    MainActivity mainActivity;
+    public Context mainContext;
     public static Socket socket;
     private static BufferedReader socketInput;
 
     private String ip;
     private int port;
-
+    static boolean isServerRechable=true;
     private static final String LOG_TAG = "CLIENT";
 
     static HashMap<String, Object> messages = new HashMap<>();
     static boolean isRobotAccepted = false;
-
+    static boolean isUserIdentified=false;
     static DelegateClient delegate;
 
     Client(String ip, int port) {
@@ -48,7 +50,7 @@ public class Client implements IClientCallback {
     }
 
     public void connect() {
-        new Thread(new Runnable() {
+        Thread t=  new Thread(new Runnable() {
             @Override
             public void run() {
 
@@ -61,10 +63,18 @@ public class Client implements IClientCallback {
 
 
                 } catch (Exception e) {
+                    Client.isServerRechable=false;
                     System.out.println("CLIENT_ ERROR connect" + e.getMessage());
                 }
             }
-        }).start();
+        });
+
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onConnect() {
@@ -90,7 +100,18 @@ public class Client implements IClientCallback {
                 delegate.setRobotAccepted(false);
                 Log.i(LOG_TAG, "Unknown : " + message);
             }
-        } else {
+        } else if (message.equals("identified")) {
+            //delegate.setRobotAccepted(false);
+            isUserIdentified=true;
+            mainActivity.menu(isUserIdentified,mainContext);
+           // mainActivity.recordVideo(isUserIdentified);
+            Log.i(LOG_TAG, "identified=");
+        } else if (message.equals("Notidentified")) {
+            //delegate.setRobotAccepted(false);
+            isUserIdentified=false;
+            mainActivity.menu(isUserIdentified,mainContext);
+            Log.i(LOG_TAG, "identified=");
+        }else {
             Log.i(LOG_TAG, "NOT HANDLED MESSAGE : " + message);
         }
     }
