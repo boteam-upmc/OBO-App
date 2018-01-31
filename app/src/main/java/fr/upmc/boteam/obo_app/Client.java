@@ -34,7 +34,7 @@ public class Client implements IClientCallback {
     static HashMap<String, Object> messages = new HashMap<>();
     static boolean isRobotAccepted = false;
     static boolean isUserIdentified=false;
-    static DelegateClient delegate;
+    public static DelegateClient delegate;
 
     public static String id_user;
     public static String id_robot;

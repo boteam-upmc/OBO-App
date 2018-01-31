@@ -26,6 +26,7 @@ import android.view.WindowManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import fr.upmc.boteam.obo_app.services.LogoutDialog;
 import fr.upmc.boteam.obo_app.services.ServerService;
@@ -259,8 +260,16 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_logout:
-                DialogFragment dialogFragment = LogoutDialog.newInstance("logout");
-                dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+                List<File> videos= Client.delegate.getVideoListFiles(new File(ServerService.videoDirectory));
+                if (videos.size() > 0){
+                    DialogFragment dialogFragment = LogoutDialog.newInstance("logout", "You will loose all of your videos.");
+                    dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+                }else {
+                    Intent intent = new Intent();
+                    intent.setClass(this,MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
 
                 return true;
             default:

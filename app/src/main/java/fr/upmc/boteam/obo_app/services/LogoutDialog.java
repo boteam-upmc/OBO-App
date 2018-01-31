@@ -9,7 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 
+import java.io.File;
+import java.util.List;
+
+import fr.upmc.boteam.obo_app.Client;
 import fr.upmc.boteam.obo_app.MainActivity;
 import fr.upmc.boteam.obo_app.R;
 
@@ -17,10 +22,11 @@ import fr.upmc.boteam.obo_app.R;
 public class LogoutDialog extends DialogFragment{
     public static final String TAG = "Dialog";
 
-    public static LogoutDialog newInstance(String action){
+    public static LogoutDialog newInstance(String action, String title){
         LogoutDialog f = new LogoutDialog();
         Bundle args = new Bundle();
         args.putSerializable("action", action);
+        args.putSerializable("title", title);
         f.setArguments(args);
         return f;
     }
@@ -32,9 +38,14 @@ public class LogoutDialog extends DialogFragment{
         final View view = inflater.inflate(R.layout.dialog, container, false);
 
         final String action = getArguments().getString("action");
+        final String title = getArguments().getString("title");
 
-        Button btn_cancel = (Button) view.findViewById(R.id.cancel) ;
-        Button btn_confirm = (Button) view.findViewById(R.id.confirm);
+        TextView titleText = view.findViewById(R.id.dialogTitle);
+        Button btn_cancel = view.findViewById(R.id.cancel) ;
+        Button btn_confirm = view.findViewById(R.id.confirm);
+        titleText.setText(title);
+        btn_cancel.setText("Cancel");
+        btn_confirm.setText("Ok");
         btn_cancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {

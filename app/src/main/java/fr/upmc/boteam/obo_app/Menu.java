@@ -99,8 +99,17 @@ public class Menu extends AppCompatActivity{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){
             if(System.currentTimeMillis()- SystemTime < 1000 && SystemTime != 0){
-                DialogFragment dialogFragment = LogoutDialog.newInstance("ExitApp");
-                dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+                List<File> videos= Client.delegate.getVideoListFiles(new File(ServerService.videoDirectory));
+                if (videos.size() > 0) {
+                    DialogFragment dialogFragment = LogoutDialog.newInstance("ExitApp", "You will loose all of your videos.");
+                    dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+                }else {
+                    Intent intent = new Intent();
+                    intent.setAction("ExitApp");
+                    intent.setClass(this,MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
             }else{
                 SystemTime = System.currentTimeMillis();
                 Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
@@ -127,8 +136,16 @@ public class Menu extends AppCompatActivity{
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_logout:
-                DialogFragment dialogFragment = LogoutDialog.newInstance("logout");
-                dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+                 List<File> videos= Client.delegate.getVideoListFiles(new File(ServerService.videoDirectory));
+                if (videos.size() > 0){
+                    DialogFragment dialogFragment = LogoutDialog.newInstance("logout", "You will loose all of your videos.");
+                    dialogFragment.show(this.getSupportFragmentManager(), "dialog");
+                }else {
+                    Intent intent = new Intent();
+                    intent.setClass(this,MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

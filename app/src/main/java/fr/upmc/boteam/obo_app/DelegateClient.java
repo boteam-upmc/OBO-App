@@ -26,7 +26,7 @@ import static fr.upmc.boteam.obo_app.services.ServerService.EXTRA_MESSAGE;
 import static fr.upmc.boteam.obo_app.services.ServerService.ACTION_SEND_VIDEO;
 import static fr.upmc.boteam.obo_app.services.ServerService.EXTRA_VIDEO;
 
-class DelegateClient {
+public class DelegateClient {
 
     /**
      * content of events
@@ -115,7 +115,7 @@ class DelegateClient {
     /** SERVER SERVICE FONCTION */
     /* ********************** */
 
-    private void sendVideo(Context appContext, String videoName) {
+    public void sendVideo(Context appContext, String videoName) {
         Intent intent = new Intent(appContext, ServerService.class);
         intent.setAction(ACTION_SEND_VIDEO);
         intent.putExtra(EXTRA_VIDEO, videoName);

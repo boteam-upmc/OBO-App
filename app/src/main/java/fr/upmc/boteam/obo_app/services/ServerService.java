@@ -1,8 +1,10 @@
 package fr.upmc.boteam.obo_app.services;
 
+import android.app.FragmentManager;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.Toast;
 
