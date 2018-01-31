@@ -53,7 +53,7 @@ public class RobotControlActivity extends AppCompatActivity {
     {
         try {
             // Change this to your localhost ip address example : 192.168.42.187
-            mSocket = IO.socket("http://192.168.42.91:3000/");
+            mSocket = IO.socket("http://192.168.42.91:1337/");
 
 
         } catch (URISyntaxException e) {
@@ -67,9 +67,12 @@ public class RobotControlActivity extends AppCompatActivity {
         setContentView(R.layout.activity_robot_control);
 
         // get the user and the robot ids
-        Intent intent = new Intent();
+        Intent intent = getIntent();
         myUser = intent.getStringExtra(Menu.EXTRA_USER);
         myRobot = intent.getStringExtra(Menu.EXTRA_ROBOT);
+
+        Log.i(LOG_TAG, "myUser = " + myUser);
+        Log.i(LOG_TAG, "myRobot = " + myRobot);
 
         // Buttons
         this.btnReset = findViewById(R.id.btnResetPanTilt);

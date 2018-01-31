@@ -67,7 +67,7 @@ public class Menu extends AppCompatActivity{
 
         mControlRobot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(Menu.this, RobotControlActivity.class);
+                Intent intent = new Intent(getApplicationContext(), RobotControlActivity.class);
                 intent.putExtra(EXTRA_USER, "teambot"); //TODO set real user
                 intent.putExtra(EXTRA_ROBOT, "123456789"); //TODO set real robot id
                 startActivity(intent);
