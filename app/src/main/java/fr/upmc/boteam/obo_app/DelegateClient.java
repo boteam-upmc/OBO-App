@@ -93,11 +93,10 @@ class DelegateClient {
         if( ! files.isEmpty()) {
             while (!files.isEmpty()) {
                 File file = files.remove();
-                if (file.getName().endsWith(".mp4")) {
+                if (file.getName().endsWith(".mp4") && file.getName().startsWith("TMP")) {
                     videoFiles.add(file);
                 }
             }
-            //videoFiles.remove(videoFiles.size() - 1);
         }
         return videoFiles;
     }
