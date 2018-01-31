@@ -1,22 +1,27 @@
 package fr.upmc.boteam.obo_app;
 
-import android.content.Intent;
-import android.os.Handler;
+import android.os.Environment;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.afollestad.materialcamera.MaterialCamera;
+
+import java.io.File;
 import java.util.UUID;
 
 import fr.upmc.boteam.obo_app.services.LogoutDialog;
 import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class Menu extends AppCompatActivity{
+
+    private static final String LOG_TAG = "Menu";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +45,7 @@ public class Menu extends AppCompatActivity{
         final Button record_video_button = findViewById(R.id.button_record_video);
         record_video_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                recordVideo(v);
+                recordVideo();
             }
         });
 
@@ -99,10 +104,45 @@ public class Menu extends AppCompatActivity{
         MainActivity.client.onDisconnect();
     }
 
-    /* ACTIVITY VIDEOCAPTURE */
-    /* ********************* */
-    public void recordVideo(View view) {
-        Intent intent = new Intent(this, VideoCapture.class);
-        startActivity(intent);
+    /**
+     * Start recording video
+     */
+    public void recordVideo() {
+        /*Intent intent = new Intent(this, VideoCapture.class);
+        startActivity(intent);*/
+
+        final int CAMERA_RQ = 6969;
+        final int QUALITY = MaterialCamera.QUALITY_480P;
+
+        new MaterialCamera(this)
+                .saveDir(getFolder())
+                .allowRetry(false) // Whether or not 'Retry' is visible during playback
+                .showPortraitWarning(false) // Whether or not a warning is displayed if the user presses record in portrait orientation
+                //.retryExits(true)
+                .qualityProfile(QUALITY)
+                .start(CAMERA_RQ);
+    }
+
+    /**
+     *
+     * @return
+     */
+    private File getFolder() {
+        File folder = new File(Environment.getExternalStorageDirectory() + "/OBOApp");
+
+        if (!folder.exists()) {
+            boolean success = folder.mkdir();
+            Log.i(LOG_TAG, "file created? " + success);
+        }
+
+        return folder;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private String getPath() {
+        return getFolder().getPath();
     }
 }

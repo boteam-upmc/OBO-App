@@ -22,7 +22,7 @@ import fr.upmc.boteam.obo_app.services.ServerService;
 public class Client implements IClientCallback {
 
     public static DatagramSocket s;
-    public    MainActivity mainActivity;
+    public MainActivity mainActivity;
     public Context mainContext;
     public static Socket socket;
     private static BufferedReader socketInput;

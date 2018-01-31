@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
         checkPermission();
 
-        mLogin = /*(EditText)*/ findViewById(R.id.et_login);
-        mPass = /*(EditText)*/ findViewById(R.id.et_pass);
+        mLogin = findViewById(R.id.et_login);
+        mPass = findViewById(R.id.et_pass);
 
         client = new Client(SERVER_ADDRESS, SERVER_PORT);
         client.mainActivity=this;
