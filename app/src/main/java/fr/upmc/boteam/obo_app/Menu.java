@@ -68,8 +68,8 @@ public class Menu extends AppCompatActivity{
         mControlRobot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), RobotControlActivity.class);
-                intent.putExtra(EXTRA_USER, "teambot"); //TODO set real user
-                intent.putExtra(EXTRA_ROBOT, "123456789"); //TODO set real robot id
+                intent.putExtra(EXTRA_USER, Client.id_user);
+                intent.putExtra(EXTRA_ROBOT, Client.id_robot);
                 startActivity(intent);
             }
         });
@@ -171,7 +171,7 @@ public class Menu extends AppCompatActivity{
             } else {
                 Log.i(LOG_TAG, "There is no new video");
                 // send old videos if they exists
-                // TODO Client.delegate.sendingAllVideos(getApplicationContext());
+                Client.delegate.sendingAllVideos(getApplicationContext());
             }
         }
     }
@@ -291,7 +291,7 @@ public class Menu extends AppCompatActivity{
                         mSplitVideo.setVisibility(View.INVISIBLE);
 
                         // send video parts to the server
-                        // TODO Client.delegate.sendingAllVideos(getApplicationContext());
+                        Client.delegate.sendingAllVideos(getApplicationContext());
                     }
 
                     @Override

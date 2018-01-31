@@ -36,6 +36,9 @@ public class Client implements IClientCallback {
     static boolean isUserIdentified=false;
     static DelegateClient delegate;
 
+    public static String id_user;
+    public static String id_robot;
+
     Client(String ip, int port) {
         try {
             s = new DatagramSocket();
@@ -84,6 +87,13 @@ public class Client implements IClientCallback {
 
         if (message.startsWith("ANDROID/")) {
             Log.i(LOG_TAG, message);
+
+        } else if(message.startsWith("DATA/")) {
+            Log.i("TEST", message);
+            String[] split = message.split("/");
+            Client.id_user = split[1];
+            Client.id_robot = split[2];
+            Log.i("SPLIT : ", Client.id_user + "/" + Client.id_robot);
 
         } else if (message.startsWith("VALID/")) {
 

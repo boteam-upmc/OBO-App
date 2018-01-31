@@ -31,6 +31,7 @@ class DelegateClient {
     // content of events
     public static class Event {
         static final String LOGIN = "onLogin";
+        static final String ASSOCIATION = "onAssociation";
     }
 
     // content of keys
@@ -67,8 +68,12 @@ class DelegateClient {
     /* ASSOCIATION REQUEST */
     /* ******************* */
 
-    void sendAssociationRequest(Context c) {
+    void sendLoginRequest(Context c) {
         sendMessage(c, Event.LOGIN, Client.delegate.toJsonFormat(Client.messages));
+    }
+
+    void sendAssociationRequest(Context c) {
+        sendMessage(c, Event.ASSOCIATION, Client.delegate.toJsonFormat(Client.messages));
     }
 
     /* SEND VIDEO */
@@ -85,13 +90,15 @@ class DelegateClient {
         List<File> videoFiles = new ArrayList<>();
         Queue<File> files = new LinkedList<>();
         files.addAll(Arrays.asList(parentDir.listFiles()));
-        while (!files.isEmpty()) {
-            File file = files.remove();
-            if (file.getName().endsWith(".mp4")) {
-                videoFiles.add(file);
+        if( ! files.isEmpty()) {
+            while (!files.isEmpty()) {
+                File file = files.remove();
+                if (file.getName().endsWith(".mp4")) {
+                    videoFiles.add(file);
+                }
             }
+            //videoFiles.remove(videoFiles.size() - 1);
         }
-        //videoFiles.remove(0);
         return videoFiles;
     }
 

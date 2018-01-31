@@ -95,7 +95,7 @@ public class ServerService extends IntentService {
                 String received = new String(packet.getData(), 0, packet.getLength());
                 Log.i("ServerService : ", received);
             }
-            buffer = "EOF".getBytes();
+            buffer = ("EOF/" + Client.id_user + "/" + Client.id_robot).getBytes();
             packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(MainActivity.SERVER_ADDRESS), MainActivity.UDP_PORT);
             Client.s.send(packet);
             packet = new DatagramPacket(buffer, buffer.length);
