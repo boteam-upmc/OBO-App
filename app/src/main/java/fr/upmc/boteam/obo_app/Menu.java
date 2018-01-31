@@ -9,9 +9,16 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.afollestad.materialcamera.MaterialCamera;
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
 import java.util.UUID;
@@ -21,7 +28,12 @@ import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class Menu extends AppCompatActivity{
 
+    /** Useful console log tag. */
     private static final String LOG_TAG = "Menu";
+
+    /** Used for video processing. */
+    private FFmpeg ffmpeg;
+    private boolean canSplitVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +64,14 @@ public class Menu extends AppCompatActivity{
         final Button send_video_button = findViewById(R.id.button_send_video);
         send_video_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Client.delegate.sendingAllVideos(getApplicationContext());
+                sendVideos();
             }
         });
+
+        // Initialise video processing
+        this.canSplitVideo = false;
+        this.ffmpeg = FFmpeg.getInstance(getApplicationContext());
+        initSplitVideo();
     }
 
     /* DOUBLE CLICK TO QUIT */
@@ -105,7 +122,7 @@ public class Menu extends AppCompatActivity{
     }
 
     /**
-     * Start recording video
+     * Start recording video.
      */
     public void recordVideo() {
         /*Intent intent = new Intent(this, VideoCapture.class);
@@ -124,11 +141,160 @@ public class Menu extends AppCompatActivity{
     }
 
     /**
-     *
-     * @return
+     * Send a new video to the server after splitting it into parts
+     * and also send old video if they exists.
+     */
+    private void sendVideos() {
+        if (getFolder().list().length <= 0) {
+            Toast.makeText(getApplicationContext(), "There is no video to send. " +
+                    "Try to record a new one.", Toast.LENGTH_SHORT).show();
+
+        } else {
+            if (existNewVideo()) {
+                chooseAndSplitVideo();
+
+            } else {
+                Log.i(LOG_TAG, "There is no new video");
+                // send old videos if exist
+                // TODO Client.delegate.sendingAllVideos(getApplicationContext());
+            }
+        }
+    }
+
+    /**
+     * Initialise video processing by loading FFmpeg binary.
+     */
+    private void initSplitVideo() {
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {}
+
+                @Override
+                public void onFailure() {}
+
+                @Override
+                public void onSuccess() {
+                    canSplitVideo = true;
+                }
+
+                @Override
+                public void onFinish() {}
+            });
+
+        } catch (FFmpegNotSupportedException e) {
+            Log.i(LOG_TAG, "FFmpeg is not supported by your device");
+        }
+    }
+
+    /**
+     * Ask the user to choose a video and split it.
+     */
+    private void chooseAndSplitVideo() {
+        new ChooserDialog()
+                .with(this)
+                // ignore trimmed videos
+                .withFilterRegex(false, false, ".*VID.*\\.mp4")
+                .withStartFile(getPath())
+                .withResources(R.string.title_choose_dict_file, R.string.title_choose, R.string.dialog_cancel)
+                .withChosenListener(new ChooserDialog.Result() {
+                    @Override
+                    public void onChoosePath(String path, File pathFile) {
+                        splitAndSendVideo(pathFile);
+                    }
+                })
+                .build()
+                .show();
+
+    }
+
+    /**
+     * Check if a file starts with 'VID' exists in a directory.
+     * @return true if a file starts with 'VID' exists, false otherwise.
+     */
+    private boolean existNewVideo() {
+        File dir = new File(getDirectory());
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().startsWith("VID")) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Split a video into 10min trims then remove it.
+     */
+    private void splitAndSendVideo(final File pathFile) {
+        if (canSplitVideo) {
+            String fileName = pathFile.getName();
+            try {
+                String[] cmd = {
+                        "-i",
+                        getPath() + File.separator + fileName,
+                        "-c",
+                        "copy",
+                        "-map",
+                        "0",
+                        "-segment_time",
+                        "600", // duration in seconds. Example : 60 = 1min
+                        "-f",
+                        "segment",
+                        getPath() + File.separator + fileName.replace("VID", "TMP") + "_" + "%03d" +".mp4"
+                };
+
+                ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
+
+                    ProgressBar mSplitVideo = findViewById(R.id.pb_split_video);
+
+                    @Override
+                    public void onStart() {
+                        mSplitVideo.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onProgress(String message) {
+                        Log.i(LOG_TAG, "onProgress : " + message);
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                        Log.i(LOG_TAG, "onFailure : " + message);
+                    }
+
+                    @Override
+                    public void onSuccess(String message) {
+                        Log.i(LOG_TAG, "onSuccess : " + message);
+
+                        boolean isDeleted = pathFile.delete();
+                        Log.i(LOG_TAG, "File deleted : " + isDeleted);
+                        mSplitVideo.setVisibility(View.INVISIBLE);
+
+                        // send video parts to the server
+                        // TODO Client.delegate.sendingAllVideos(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onFinish() {}
+                });
+
+            } catch (FFmpegCommandAlreadyRunningException e) {
+                Log.i(LOG_TAG, "FFmpeg is already running");
+            }
+        }
+    }
+
+    /**
+     * Create or find an existing external storage folder.
+     * @return An external storage folder.
      */
     private File getFolder() {
-        File folder = new File(Environment.getExternalStorageDirectory() + "/OBOApp");
+        File folder = new File(getDirectory());
 
         if (!folder.exists()) {
             boolean success = folder.mkdir();
@@ -139,10 +305,18 @@ public class Menu extends AppCompatActivity{
     }
 
     /**
-     *
-     * @return
+     * Get the existing external storage path.
+     * @return An external storage path.
      */
     private String getPath() {
         return getFolder().getPath();
+    }
+
+    /**
+     * Get the external storage directory.
+     * @return An external storage directory.
+     */
+    private String getDirectory() {
+        return Environment.getExternalStorageDirectory() + "/OBOApp";
     }
 }
