@@ -1,5 +1,6 @@
 package fr.upmc.boteam.obo_app;
 
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -26,10 +27,16 @@ import java.util.UUID;
 import fr.upmc.boteam.obo_app.services.LogoutDialog;
 import fr.upmc.boteam.obo_app.services.ServerService;
 
+/**
+ *
+ */
 public class Menu extends AppCompatActivity{
 
     /** Useful console log tag. */
     private static final String LOG_TAG = "Menu";
+
+    public static final String EXTRA_USER = "fr.upmc.boteam.obo_app.Menu.extra_user";
+    public static final String EXTRA_ROBOT = "fr.upmc.boteam.obo_app.Menu.extra_robot";
 
     /** Used for video processing. */
     private FFmpeg ffmpeg;
@@ -40,8 +47,12 @@ public class Menu extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        final Button send_association_button = findViewById(R.id.button_send_association);
-        send_association_button.setOnClickListener(new View.OnClickListener() {
+        Button mSendAssociation = findViewById(R.id.button_send_association);
+        Button mControlRobot = findViewById(R.id.button_control_robot);
+        Button mrecordVideo = findViewById(R.id.button_record_video);
+        Button sendVideo = findViewById(R.id.button_send_video);
+
+        mSendAssociation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Client.delegate.set_User_Robot(
                         String.valueOf(MainActivity.mLogin.getText()),
@@ -54,15 +65,22 @@ public class Menu extends AppCompatActivity{
             }
         });
 
-        final Button record_video_button = findViewById(R.id.button_record_video);
-        record_video_button.setOnClickListener(new View.OnClickListener() {
+        mControlRobot.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(Menu.this, RobotControlActivity.class);
+                intent.putExtra(EXTRA_USER, "teambot"); //TODO set real user
+                intent.putExtra(EXTRA_ROBOT, "123456789"); //TODO set real robot id
+                startActivity(intent);
+            }
+        });
+
+        mrecordVideo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 recordVideo();
             }
         });
 
-        final Button send_video_button = findViewById(R.id.button_send_video);
-        send_video_button.setOnClickListener(new View.OnClickListener() {
+        sendVideo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 sendVideos();
             }
@@ -125,9 +143,6 @@ public class Menu extends AppCompatActivity{
      * Start recording video.
      */
     public void recordVideo() {
-        /*Intent intent = new Intent(this, VideoCapture.class);
-        startActivity(intent);*/
-
         final int CAMERA_RQ = 6969;
         final int QUALITY = MaterialCamera.QUALITY_480P;
 
@@ -155,7 +170,7 @@ public class Menu extends AppCompatActivity{
 
             } else {
                 Log.i(LOG_TAG, "There is no new video");
-                // send old videos if exist
+                // send old videos if they exists
                 // TODO Client.delegate.sendingAllVideos(getApplicationContext());
             }
         }

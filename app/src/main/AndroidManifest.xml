@@ -19,7 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--Set the Activity start mode to singleTop -->
+
+        <!-- Set the Activity start mode to singleTop -->
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -32,7 +33,7 @@
         </activity>
         <activity
             android:name=".VideoCapture"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".services.ServerService"
@@ -43,17 +44,19 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!--video camera recording-->
+        <!-- video camera recording -->
         <activity
             android:name="com.afollestad.materialcamera.CaptureActivity"
             android:theme="@style/MaterialCamera.CaptureActivity" />
         <activity
             android:name="com.afollestad.materialcamera.CaptureActivity2"
             android:theme="@style/MaterialCamera.CaptureActivity" />
+        <activity android:name=".RobotControlActivity"></activity>
     </application>
 
 </manifest>

@@ -20,6 +20,13 @@
             android:text="ASSOCIATE ROBOT"/>
 
         <Button
+            android:id="@+id/button_control_robot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="CONTROL ROBOT"/>
+
+        <Button
             android:id="@+id/button_record_video"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

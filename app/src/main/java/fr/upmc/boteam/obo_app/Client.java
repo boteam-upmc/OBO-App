@@ -6,19 +6,18 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
 
 import fr.upmc.boteam.obo_app.interfaces.IClientCallback;
 import fr.upmc.boteam.obo_app.services.ServerService;
 
+/**
+ *
+ */
 public class Client implements IClientCallback {
 
     public static DatagramSocket s;

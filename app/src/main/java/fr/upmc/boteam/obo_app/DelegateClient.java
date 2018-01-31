@@ -95,51 +95,6 @@ class DelegateClient {
         return videoFiles;
     }
 
-    /* SPLIT VIDEO */
-    /* *********** */
-
-    static void splitVideo(String videoFileName, int videoTime) {
-        try {
-            File file = new File(videoFileName);//File read from Source folder to Split.
-            if (file.exists()) {
-
-                String videoFileNameWithoutExtension = file.getName().substring(0, file.getName().lastIndexOf(".")); // Name of the videoFile without extension
-
-                int i = 0; // Files count starts from 0
-                InputStream inputStream = new FileInputStream(file);
-                String videoFile = ServerService.videoDirectory + "VIDEO" + "_" + i;// Location to save the files which are Split from the original file.
-                OutputStream outputStream = new FileOutputStream(videoFile);
-                //System.out.println("File Created Location: "+ videoFile);
-                int totalPartsToSplit = videoTime / 600;// Total files to split.
-                int splitSize = inputStream.available() / totalPartsToSplit;
-                int streamSize = 0;
-                int read = 0;
-                while ((read = inputStream.read()) != -1) {
-
-                    if (splitSize == streamSize) {
-                        if (i != totalPartsToSplit) {
-                            i++;
-                            videoFile = ServerService.videoDirectory + "VIDEO" + "_" + i;
-                            outputStream = new FileOutputStream(videoFile);
-                            //System.out.println("File Created Location: "+ videoFile);
-                            streamSize = 0;
-                        }
-                    }
-                    outputStream.write(read);
-                    streamSize++;
-                }
-
-                inputStream.close();
-                outputStream.close();
-                //System.out.println("Total files Split ->"+ totalPartsToSplit);
-            } else {
-                System.err.println(file.getAbsolutePath() +" File Not Found.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /* SERVERSERVICE FONCTION */
     /* ********************** */
 
