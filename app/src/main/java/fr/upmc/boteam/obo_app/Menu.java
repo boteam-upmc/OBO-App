@@ -92,7 +92,7 @@ public class Menu extends AppCompatActivity{
         initSplitVideo();
     }
 
-    /* DOUBLE CLICK TO QUIT */
+    /** DOUBLE CLICK TO QUIT */
     /* ******************** */
     long SystemTime = 0;
     @Override
@@ -109,7 +109,7 @@ public class Menu extends AppCompatActivity{
         return false;
     }
 
-    /* SHOW ITEM TO THE APP BAR */
+    /** SHOW ITEM TO THE APP BAR */
     /* ************************ */
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu)
@@ -118,7 +118,10 @@ public class Menu extends AppCompatActivity{
         return true;
     }
 
-    //handling click events
+    /**
+     * handling click events
+     */
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection

@@ -20,7 +20,7 @@ import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static String SERVER_ADDRESS = "192.168.43.250";
+    public static String SERVER_ADDRESS = "192.168.1.91";
     //public static String SERVER_ADDRESS = "192.168.1.89";
     //public static String SERVER_ADDRESS = "192.168.1.34";
     //public static String SERVER_ADDRESS = "192.168.1.91";
@@ -91,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
         client.onDisconnect();
     }
 
-    /* ACTIVITY MENU */
+    /**
+     *  ACTIVITY MENU */
     /* ************* */
     public void menu(boolean isUserIdentified, Context c) {
         if(isUserIdentified) {
@@ -102,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /* CHECK FOR PERMISSION */
+    /**
+     *  We ask user all permission when we lauch the app */
     /* ******************** */
     public void checkPermission() {
         if(ContextCompat.checkSelfPermission(this,

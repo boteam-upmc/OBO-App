@@ -28,20 +28,27 @@ import static fr.upmc.boteam.obo_app.services.ServerService.EXTRA_VIDEO;
 
 class DelegateClient {
 
-    // content of events
+    /**
+     * content of events
+      */
+
     public static class Event {
         static final String LOGIN = "onLogin";
         static final String ASSOCIATION = "onAssociation";
     }
 
-    // content of keys
+    /**
+     *   content of keys
+     */
+
     public static class Key {
         static final String PASS = "PASS";
         static final String LOGIN = "LOGIN";
         static final String SERIAL_NUMBER = "SERIAL_NUMBER";
     }
 
-    /* ROBOT MANAGEMENT */
+    /**
+     *  ROBOT MANAGEMENT */
     /* **************** */
 
     void set_User_Robot(String login, String pass, String serialNumber) {
@@ -57,7 +64,8 @@ class DelegateClient {
         Client.messages.put(Key.SERIAL_NUMBER, serialNumber);
     }
 
-    /* USER MANAGEMENT */
+    /**
+     *  USER MANAGEMENT */
     /* *************** */
 
     private void setUser(String login, String pass) {
@@ -65,7 +73,8 @@ class DelegateClient {
         Client.messages.put(Key.PASS, pass);
     }
 
-    /* ASSOCIATION REQUEST */
+    /**
+     *  ASSOCIATION REQUEST */
     /* ******************* */
 
     void sendLoginRequest(Context c) {
@@ -78,6 +87,10 @@ class DelegateClient {
 
     /* SEND VIDEO */
     /* ********** */
+    /**
+     *  Send video to the server
+     /* ********** */
+
 
     void sendingAllVideos(Context appContext) {
         List<File> videoListFiles = getVideoListFiles(new File(ServerService.videoDirectory));
@@ -101,7 +114,7 @@ class DelegateClient {
         return videoFiles;
     }
 
-    /* SERVERSERVICE FONCTION */
+    /** SERVER SERVICE FONCTION */
     /* ********************** */
 
     private void sendVideo(Context appContext, String videoName) {
@@ -119,7 +132,8 @@ class DelegateClient {
         appContext.startService(intent);
     }
 
-    /* JSON FORMAT */
+    /**
+     *  JSON FORMAT */
     /* *********** */
 
     private String toJsonFormat(HashMap<String, Object> fields) {
