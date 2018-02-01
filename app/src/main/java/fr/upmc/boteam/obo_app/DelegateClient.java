@@ -85,8 +85,6 @@ class DelegateClient {
         sendMessage(c, Event.ASSOCIATION, Client.delegate.toJsonFormat(Client.messages));
     }
 
-    /* SEND VIDEO */
-    /* ********** */
     /**
      *  Send video to the server
      /* ********** */
