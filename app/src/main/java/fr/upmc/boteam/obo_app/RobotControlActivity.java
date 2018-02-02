@@ -30,7 +30,7 @@ public class RobotControlActivity extends AppCompatActivity {
     private String myUser;
     private String myRobot;
 
-    protected Button btnReset;
+    //protected Button btnReset;
     protected Button btnForwards;
     protected Button btnTurnLeft;
     protected Button btnStop;
@@ -75,7 +75,7 @@ public class RobotControlActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "myRobot = " + myRobot);
 
         // Buttons
-        this.btnReset = findViewById(R.id.btnResetPanTilt);
+        //this.btnReset = findViewById(R.id.btnResetPanTilt);
         this.btnForwards = findViewById(R.id.btnForward);
         this.btnTurnLeft =  findViewById(R.id.btnTurnLeft);
         this.btnStop = findViewById(R.id.btnStop);
@@ -100,7 +100,7 @@ public class RobotControlActivity extends AppCompatActivity {
         btnTurnLeft.setOnClickListener(clickButton);
         btnTurnRight.setOnClickListener(clickButton);
         btnStop.setOnClickListener(clickButton);
-        btnReset.setOnClickListener(clickButton);
+        //btnReset.setOnClickListener(clickButton);
 
         tglRCMode.setChecked(false);
         tglMode.setChecked(false);
@@ -204,7 +204,15 @@ public class RobotControlActivity extends AppCompatActivity {
                     JSONObject data = (JSONObject) args[0];
                     Log.i(LOG_TAG, "[onReset] " + data);
                     if (data.opt("USER").equals(myUser) && data.opt("ROBOT").equals(myRobot)) {
-                        btnReset.performClick();
+                        tglRCMode.setChecked(false);
+                        tglMode.setChecked(false);
+                        tglLeds.setChecked(false);
+                        skBarAngVel.setProgress(0);
+                        skBarTime.setProgress(0);
+                        skBarAngle.setProgress(0);
+                        skBarPan.setProgress(0);
+                        skBarTilt.setProgress(0);
+                        skBarPeriod.setProgress(0);
                     }
                 }
             });

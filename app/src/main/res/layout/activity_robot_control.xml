@@ -74,7 +74,7 @@
         app:layout_constraintStart_toEndOf="@+id/tglMode"
         app:layout_constraintTop_toTopOf="@+id/tglMode" />
 
-    <Button
+    <!--<Button
         android:id="@+id/btnResetPanTilt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
         android:layout_marginRight="16dp"
         android:text="RESET"
         app:layout_constraintEnd_toStartOf="@+id/btnForward"
-        app:layout_constraintTop_toTopOf="@+id/btnForward" />
+        app:layout_constraintTop_toTopOf="@+id/btnForward" />-->
 
     <Button
         android:id="@+id/btnForward"
@@ -101,11 +101,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="LEFT"
         app:layout_constraintEnd_toStartOf="@+id/btnStop"
-        app:layout_constraintTop_toBottomOf="@+id/btnResetPanTilt" />
+        app:layout_constraintTop_toBottomOf="@+id/space" />
 
     <Button
         android:id="@+id/btnStop"
