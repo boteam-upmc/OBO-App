@@ -22,6 +22,7 @@ import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedExceptio
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import fr.upmc.boteam.obo_app.services.LogoutDialog;
