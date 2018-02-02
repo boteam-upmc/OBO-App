@@ -20,9 +20,6 @@ import fr.upmc.boteam.obo_app.services.ServerService;
 
 public class MainActivity extends AppCompatActivity {
 
-    //public static String SERVER_ADDRESS = "192.168.1.91";
-    //public static String SERVER_ADDRESS = "192.168.1.89";
-    //public static String SERVER_ADDRESS = "192.168.1.34";
     public static String SERVER_ADDRESS = "192.168.43.250";
 
     public static int UDP_PORT = 3001;
@@ -42,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /**
+         * check if the application has required permission
+         */
         checkPermission();
 
         mLogin = findViewById(R.id.et_login);
