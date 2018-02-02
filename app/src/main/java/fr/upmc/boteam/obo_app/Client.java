@@ -51,6 +51,12 @@ public class Client implements IClientCallback {
         Client.delegate = new DelegateClient();
     }
 
+    /**
+     * We user login we save the ip adress of the server
+     * when something is wrong with the adresse we notice that
+     * the server is unreachable
+     *
+     */
     public void connect() {
         Thread t=  new Thread(new Runnable() {
             @Override
@@ -83,6 +89,11 @@ public class Client implements IClientCallback {
         Log.i(LOG_TAG, "Client connected.");
     }
 
+    /**
+     *
+     * We parse an reserving message from the server
+     * @param message
+     */
     public void onMessage(String message) {
 
         if (message.startsWith("ANDROID/")) {
@@ -124,7 +135,9 @@ public class Client implements IClientCallback {
             Log.i(LOG_TAG, "NOT HANDLED MESSAGE : " + message);
         }
     }
-
+    /**
+     * Delecting all video capture during application activity
+     */
     public void onDisconnect() {
         Log.i(LOG_TAG, "Client disconnected.");
 
@@ -150,6 +163,9 @@ public class Client implements IClientCallback {
         return Client.socket != null;
     }
 
+    /**
+     * A thread for geting all data received from server
+     */
     private class ReceiveThread extends Thread implements Runnable {
 
         public void run() {

@@ -241,7 +241,7 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         return bitmap;
     }
 
-    /* SHOW ITEM TO THE APP BAR */
+    /** SHOW ITEM TO THE APP BAR */
     /* ************************ */
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu)
@@ -250,7 +250,10 @@ public class VideoCapture extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    //handling click events
+    /**
+     *  handling click events
+     */
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection

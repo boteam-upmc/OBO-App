@@ -53,7 +53,7 @@ public class RobotControlActivity extends AppCompatActivity {
     {
         try {
             // Change this to your localhost ip address example : 192.168.42.187
-            mSocket = IO.socket("http://192.168.42.91:1337/");
+            mSocket = IO.socket("http://" + MainActivity.SERVER_ADDRESS + ":3000/");
 
 
         } catch (URISyntaxException e) {
